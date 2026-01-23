@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartTrack Attendance – Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --border-glass: rgba(148, 163, 184, 0.4);
+      --accent: #38bdf8;
+      --accent-2: #a855f7;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-lg: 22px;
+      --radius-xl: 26px;
+      --shadow-strong: 0 24px 80px rgba(15, 23, 42, 0.85);
+      --transition-fast: 0.2s ease-out;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, #1d4ed8 0, #020617 40%),
+        radial-gradient(circle at bottom right, #a855f7 0, #020617 48%);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(32px);
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: linear-gradient(
+        to bottom,
+        rgba(15, 23, 42, 0.96),
+        rgba(15, 23, 42, 0.7),
+        transparent
+      );
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(24px);
+    }
+
+    .logo {
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f9fafb, #38bdf8 30%, #0f172a 72%);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.7);
+      position: relative;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    .nav-link {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color var(--transition-fast), background var(--transition-fast),
+        transform var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link.active {
+      background: rgba(15, 23, 42, 0.98);
+      color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .app-main {
+      flex: 1;
+      padding: 20px max(20px, 7vw) 28px;
+    }
+
+    .btn-primary {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 10px 20px;
+      background-image: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      box-shadow: 0 18px 45px rgba(56, 189, 248, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform var(--transition-fast),
+        box-shadow var(--transition-fast), filter var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary.small {
+      padding: 7px 14px;
+      font-size: 12px;
+    }
+
+    .btn-primary.full-width {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 20px 60px rgba(56, 189, 248, 0.7);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 9px 18px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      color: var(--text-main);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast),
+        border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.98);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .active-view {
+      display: block;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 32px;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(30px, 3.8vw, 40px);
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 18px;
+      color: var(--text-muted);
+      max-width: 520px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      align-items: center;
+    }
+
+    .hero-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.8);
+    }
+
+    .hero-preview {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .glass-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-strong);
+      padding: 18px 18px 16px;
+      backdrop-filter: blur(24px);
+    }
+
+    .hero-card {
+      width: 100%;
+      max-width: 360px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      background: radial-gradient(
+        circle at top,
+        rgba(56, 189, 248, 0.09),
+        transparent 60%
+      );
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .hero-metrics {
+      display: flex;
+      gap: 11px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric {
+      flex: 1;
+      padding: 10px 10px 9px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .metric-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .metric-sub {
+      font-size: 10px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .hero-bars {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 10px;
+    }
+
+    .hero-bar-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .hero-bar {
+      flex: 1;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        rgba(56, 189, 248, 0.1),
+        rgba(56, 189, 248, 0.8)
+      );
+    }
+
+    .hero-bar.alt {
+      background: linear-gradient(
+        90deg,
+        rgba(168, 85, 247, 0.1),
+        rgba(168, 85, 247, 0.8)
+      );
+    }
+
+    .hero-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .hero-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 20px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .field-group {
+      flex: 1;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .field-group input,
+    .field-group select {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .field-group input::placeholder {
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    .field-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mini-chip {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    .mini-chip strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .attendance-table {
+      width: 100%;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .attendance-table thead {
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .attendance-table th {
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .attendance-table tbody tr {
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .attendance-table tbody tr + tr td {
+      border-top: 1px solid rgba(15, 23, 42, 0.95);
+    }
+
+    .attendance-table tr:hover {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .student-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .student-name {
+      font-weight: 500;
+    }
+
+    .student-id {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .status-dot-present {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--success);
+    }
+
+    .status-dot-late {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #facc15;
+    }
+
+    .status-dot-absent {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #f97373;
+    }
+
+    .tag-pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-item {
+      padding: 10px 11px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .summary-value {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .summary-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .summary-pill {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-muted);
+    }
+
+    .alert-banner {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: rgba(248, 113, 113, 0.06);
+      border: 1px dashed rgba(248, 113, 113, 0.65);
+      font-size: 12px;
+      color: var(--danger);
+    }
+
+    .alert-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--danger);
+      margin-top: 4px;
+    }
+
+    .empty-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .pill-soft {
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px dashed var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .footer {
+      padding: 10px max(20px, 7vw) 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(15, 23, 42, 0.9);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), #020617);
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-preview {
+        justify-content: flex-start;
+      }
+
+      .hero-card {
+        max-width: 100%;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-header {
+        padding-inline: 14px;
+        gap: 10px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .app-main {
+        padding-inline: 14px;
+      }
+
+      .footer {
+        padding-inline: 14px;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        SMARTTRACK <span>AI</span>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-link active" data-view="attendance">
+          <span class="nav-dot"></span>
+          Attendance
+        </button>
+        <button class="nav-link" data-view="students">
+          Students
+        </button>
+        <button class="nav-link" data-view="analytics">
+          Analytics
+        </button>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn-ghost">
+          Demo Class · CSE-A
+        </button>
+        <button class="btn-primary small">
+          Mark today
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="hero">
+        <div class="hero-text">
+          <p class="pill">Live demo · Smart attendance UI</p>
+          <h1>Make classroom attendance feel like using a dashboard, not a spreadsheet.</h1>
+          <p class="hero-subtitle">
+            This front-end demo shows how SmartTrack AI could look for teachers:
+            searchable student list, clear status tags, and a compact summary of each session.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-primary">
+              Try marking a row
+            </button>
+            <button class="btn-ghost">
+              View analytics mock
+            </button>
+          </div>
+          <div class="hero-meta">
+            <span>Demo only · No real data stored</span>
+            <span class="hero-dot"></span>
+            <span>Ready to plug into a Node.js + SQLite backend later</span>
+          </div>
+        </div>
+
+        <div class="hero-preview">
+          <div class="glass-card hero-card">
+            <div class="hero-card-header">
+              <span>Today · 9:00–10:00 AM</span>
+              <span class="status-pill">
+                <span class="status-dot"></span>
+                Attendance live
+              </span>
+            </div>
+
+            <div class="hero-metrics">
+              <div class="metric">
+                <span class="metric-label">Present</span>
+                <div class="metric-value">26</div>
+                <div class="metric-sub">of 32 students</div>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Late arrivals</span>
+                <div class="metric-value">3</div>
+                <div class="metric-sub">flagged for follow-up</div>
+              </div>
+            </div>
+
+            <div class="hero-bars">
+              <div class="hero-bar-row">
+                <div class="hero-bar"></div>
+                <div class="hero-bar alt"></div>
+              </div>
+              <div class="hero-bar-row">
+                <div class="hero-bar alt"></div>
+                <div class="hero-bar"></div>
+              </div>
+            </div>
+
+            <div class="hero-footer">
+              <div class="hero-pill-row">
+                <div class="chip">CSE · Semester 3</div>
+                <div class="chip">Data Structures</div>
+              </div>
+              <span>SmartTrack AI · Preview mode</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="attendanceView" class="view active-view">
+        <div class="glass-card">
+          <div class="section-header">
+            <div>
+              <h2>Today's attendance · CSE-A</h2>
+              <p class="section-subtitle">
+                Quickly scan, search, and update status for each student in the class.
+              </p>
+            </div>
+            <div class="controls-row">
+              <div class="field-group">
+                <span style="font-size: 12px; color: var(--text-muted);">🔍</span>
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Search by name or roll number"
+                />
+              </div>
+              <div class="field-group" style="flex: 0 0 auto; min-width: 140px;">
+                <span style="font-size: 12px; color: var(--text-muted);">Status</span>
+                <select id="statusFilter">
+                  <option value="all">All</option>
+                  <option value="present">Present</option>
+                  <option value="late">Late</option>
+                  <option value="absent">Absent</option>
+                </select>
+              </div>
+              <button class="btn-primary small" style="flex: 0 0 auto;">
+                Quick save snapshot
+              </button>
+            </div>
+          </div>
+
+          <div class="layout" style="margin-top: 12px;">
+            <div class="column">
+              <div class="glass-card" style="padding-top: 10px;">
+                <div class="field-chip-row" style="margin-bottom: 8px;">
+                  <div class="mini-chip">
+                    Period: <strong>1</strong>
+                  </div>
+                  <div class="mini-chip">
+                    Date: <strong id="dateLabel"></strong>
+                  </div>
+                  <div class="mini-chip">
+                    Room: <strong>LH-204</strong>
+                  </div>
+                </div>
+
+                <div style="max-height: 260px; overflow: hidden auto; border-radius: 14px; border: 1px solid rgba(15, 23, 42, 0.95);">
+                  <table class="attendance-table" id="attendanceTable">
+                    <thead>
+                      <tr>
+                        <th style="width: 32%;">Student</th>
+                        <th style="width: 18%;">Roll</th>
+                        <th style="width: 20%;">Status</th>
+                        <th style="width: 20%;">Tags</th>
+                        <th style="width: 10%; text-align: right;">Mark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Rows injected by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="glass-card" style="padding-top: 12px;">
+                <div class="section-header" style="margin-bottom: 10px;">
+                  <div>
+                    <h2>Session summary</h2>
+                    <p class="section-subtitle">
+                      High-level snapshot for this class only. No data is saved.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="summary-grid">
+                  <div class="summary-item">
+                    <div class="summary-label">Total students</div>
+                    <div class="summary-value" id="totalStudents">0</div>
+                    <div class="summary-pill-row">
+                      <span class="summary-pill">CSE-A · Section</span>
+                    </div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-label">Present now</div>
+                    <div class="summary-value" id="presentCount">0</div>
+                    <div class="summary-pill-row">
+                      <span class="summary-pill">Live count</span>
+                    </div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-label">Late arrivals</div>
+                    <div class="summary-value" id="lateCount">0</div>
+                    <div class="summary-pill-row">
+                      <span class="summary-pill">Arrived after bell</span>
+                    </div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-label">Absent</div>
+                    <div class="summary-value" id="absentCount">0</div>
+                    <div class="summary-pill-row">
+                      <span class="summary-pill">To follow up</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                  <div class="alert-banner">
+                    <span class="alert-dot"></span>
+                    <div>
+                      <strong>Heads-up, teacher.</strong>
+                      <div id="alertText">
+                        No students marked absent yet. This section will highlight patterns
+                        when more data is available.
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="empty-hint">
+                    In a real deployment, this panel could show:
+                  </p>
+                  <div class="summary-pill-row">
+                    <span class="pill-soft">Frequent absentees in this course</span>
+                    <span class="pill-soft">AI suggestions for follow-up</span>
+                    <span class="pill-soft">Per-topic attendance trends</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="studentsView" class="view">
+        <div class="glass-card">
+          <div class="section-header">
+            <div>
+              <h2>Students (read-only demo)</h2>
+              <p class="section-subtitle">
+                Imagine a simple, searchable roster synced from your college database.
+              </p>
+            </div>
+            <button class="btn-primary small">
+              Import from CSV (mock)
+            </button>
+          </div>
+
+          <p class="empty-hint">
+            This is a placeholder view. In the real app, you could see student profiles,
+            history of attendance, and notes per student.
+          </p>
+        </div>
+      </section>
+
+      <section id="analyticsView" class="view">
+        <div class="glass-card">
+          <div class="section-header">
+            <div>
+              <h2>Analytics (concept)</h2>
+              <p class="section-subtitle">
+                High-level trends for a semester: attendance percentage, critical students,
+                and course-wise breakdowns.
+              </p>
+            </div>
+          </div>
+          <p class="empty-hint">
+            For now, this demo focuses on the attendance-taking flow. You can wire this
+            view to charts once the backend is ready.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>SmartTrack AI · Frontend demo · No real data stored.</span>
+      <span>Built as a portfolio-friendly concept for an AI-powered attendance system.</span>
+    </footer>
+  </div>
+
+  <script>
+    const students = [
+      {
+        name: "Aarav Kumar",
+        roll: "CSE-A-001",
+        tags: ["CR"],
+        status: "present",
+      },
+      {
+        name: "Ananya Sharma",
+        roll: "CSE-A-002",
+        tags: ["Top performer"],
+        status: "present",
+      },
+      {
+        name: "Rahul Verma",
+        roll: "CSE-A-003",
+        tags: ["Frequent late"],
+        status: "late",
+      },
+      {
+        name: "Sneha Patil",
+        roll: "CSE-A-004",
+        tags: [],
+        status: "present",
+      },
+      {
+        name: "Mohammed Iqbal",
+        roll: "CSE-A-005",
+        tags: ["On notice"],
+        status: "absent",
+      },
+      {
+        name: "Priya Reddy",
+        roll: "CSE-A-006",
+        tags: [],
+        status: "present",
+      },
+      {
+        name: "Vikram Singh",
+        roll: "CSE-A-007",
+        tags: ["Sports quota"],
+        status: "late",
+      },
+      {
+        name: "Kavya Nair",
+        roll: "CSE-A-008",
+        tags: [],
+        status: "present",
+      },
+    ];
+
+    const attendanceTableBody = document.querySelector(
+      "#attendanceTable tbody"
+    );
+    const totalStudentsEl = document.getElementById("totalStudents");
+    const presentCountEl = document.getElementById("presentCount");
+    const lateCountEl = document.getElementById("lateCount");
+    const absentCountEl = document.getElementById("absentCount");
+    const dateLabel = document.getElementById("dateLabel");
+    const alertText = document.getElementById("alertText");
+
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+
+    function formatToday() {
+      const today = new Date();
+      const opts = { day: "2-digit", month: "short", year: "numeric" };
+      return today.toLocaleDateString(undefined, opts);
+    }
+
+    dateLabel.textContent = formatToday();
+
+    function renderTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filter = statusFilter.value;
+
+      attendanceTableBody.innerHTML = "";
+
+      let present = 0;
+      let late = 0;
+      let absent = 0;
+      let total = 0;
+
+      students.forEach((student, index) => {
+        const matchesSearch =
+          student.name.toLowerCase().includes(searchTerm) ||
+          student.roll.toLowerCase().includes(searchTerm);
+
+        const matchesStatus =
+          filter === "all" ? true : student.status === filter;
+
+        if (!matchesSearch || !matchesStatus) return;
+
+        total += 1;
+        if (student.status === "present") present += 1;
+        if (student.status === "late") late += 1;
+        if (student.status === "absent") absent += 1;
+
+        const tr = document.createElement("tr");
+
+        const studentTd = document.createElement("td");
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "student-meta";
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "student-name";
+        nameDiv.textContent = student.name;
+        const idDiv = document.createElement("div");
+        idDiv.className = "student-id";
+        idDiv.textContent = "ID · " + student.roll;
+        metaDiv.appendChild(nameDiv);
+        metaDiv.appendChild(idDiv);
+        studentTd.appendChild(metaDiv);
+
+        const rollTd = document.createElement("td");
+        rollTd.textContent = student.roll;
+
+        const statusTd = document.createElement("td");
+        const statusBadge = document.createElement("span");
+        statusBadge.className = "status-badge";
+        const dotSpan = document.createElement("span");
+        if (student.status === "present") {
+          dotSpan.className = "status-dot-present";
+        } else if (student.status === "late") {
+          dotSpan.className = "status-dot-late";
+        } else {
+          dotSpan.className = "status-dot-absent";
+        }
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent =
+          student.status.charAt(0).toUpperCase() + student.status.slice(1);
+        statusBadge.appendChild(dotSpan);
+        statusBadge.appendChild(labelSpan);
+        statusTd.appendChild(statusBadge);
+
+        const tagsTd = document.createElement("td");
+        if (student.tags && student.tags.length > 0) {
+          student.tags.forEach((tag) => {
+            const tagEl = document.createElement("span");
+            tagEl.className = "tag-pill";
+            tagEl.textContent = tag;
+            tagsTd.appendChild(tagEl);
+          });
+        } else {
+          tagsTd.innerHTML =
+            '<span class="tag-pill" style="opacity: 0.7;">No tag</span>';
+        }
+
+        const markTd = document.createElement("td");
+        markTd.style.textAlign = "right";
+        const select = document.createElement("select");
+        select.style.background = "transparent";
+        select.style.color = "inherit";
+        select.style.border = "none";
+        select.style.outline = "none";
+        select.style.fontSize = "12px";
+        ["present", "late", "absent"].forEach((status) => {
+          const option = document.createElement("option");
+          option.value = status;
+          option.textContent =
+            status.charAt(0).toUpperCase() + status.slice(1);
+          if (status === student.status) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+        select.addEventListener("change", (e) => {
+          students[index].status = e.target.value;
+          renderTable();
+        });
+        markTd.appendChild(select);
+
+        tr.appendChild(studentTd);
+        tr.appendChild(rollTd);
+        tr.appendChild(statusTd);
+        tr.appendChild(tagsTd);
+        tr.appendChild(markTd);
+
+        attendanceTableBody.appendChild(tr);
+      });
+
+      totalStudentsEl.textContent = total;
+      presentCountEl.textContent = present;
+      lateCountEl.textContent = late;
+      absentCountEl.textContent = absent;
+
+      if (absent > 0 || late > 0) {
+        alertText.textContent =
+          "There are " +
+          absent +
+          " absentees and " +
+          late +
+          " late arrivals. In a real app, AI could surface students to check on.";
+      } else {
+        alertText.textContent =
+          "No students marked absent yet. This section will highlight patterns when more data is available.";
+      }
+    }
+
+    renderTable();
+
+    searchInput.addEventListener("input", renderTable);
+    statusFilter.addEventListener("change", renderTable);
+
+    const navLinks = document.querySelectorAll(".nav-link");
+    const views = {
+      attendance: document.getElementById("attendanceView"),
+      students: document.getElementById("studentsView"),
+      analytics: document.getElementById("analyticsView"),
+    };
+
+    navLinks.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        navLinks.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const view = btn.getAttribute("data-view");
+        Object.keys(views).forEach((key) => {
+          views[key].classList.toggle("active-view", key === view);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
