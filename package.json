@@ -1,0 +1,25 @@
+{
+  "name": "smarttrack-ai",
+  "version": "1.0.0",
+  "description": "SmartTrack AI is a modern attendance tracking system demo that combines a sleek web UI with an AI-assisted backend for smarter classroom and lab management.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zaidansheikh180-gif/smartTrack-AI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zaidansheikh180-gif/smartTrack-AI/issues"
+  },
+  "homepage": "https://github.com/zaidansheikh180-gif/smartTrack-AI#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1"
+  }
+}
