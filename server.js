@@ -10,9 +10,22 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve index.html from root
+// Serve static assets from /public (for CSS, images, JS if needed)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Landing page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'landing.html'));
+});
+
+// Login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// Teacher dashboard (main app UI)
+app.get('/teacher', (req, res) => {
+  res.sendFile(path.join(__dirname, 'teacher.html'));
 });
 
 // Save an attendance session

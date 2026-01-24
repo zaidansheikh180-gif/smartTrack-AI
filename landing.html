@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SmartTrack AI – Smart Attendance for Modern Classrooms</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #0b1020;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.12);
+      --accent-2: #22c55e;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --danger: #ef4444;
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.85);
+      --radius-xl: 18px;
+      --radius-full: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, #4f46e5, #22c55e, #06b6d4, #4f46e5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 30px rgba(88, 80, 236, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo-inner {
+      width: 23px;
+      height: 23px;
+      border-radius: 9px;
+      background: radial-gradient(circle at 20% 0%, #e5e7eb 0, #0f172a 52%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-text-title {
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 6px 11px;
+      border-radius: var(--radius-full);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0%, #4ade80 0, #16a34a 60%, #15803d 100%);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-ghost {
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-ghost span {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.95);
+      transform: translateY(-0.5px);
+    }
+
+    /* Main layout */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
+      gap: 32px;
+      align-items: center;
+    }
+
+    @media (max-width: 840px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Left hero */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: radial-gradient(circle at 0 0, #4f46e5 0, rgba(15, 23, 42, 0.0) 45%),
+                  rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      font-size: 11px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-label {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .headline {
+      font-size: clamp(28px, 4vw, 36px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .headline-gradient {
+      background: linear-gradient(120deg, #e5e7eb, #a5b4fc, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .headline span {
+      display: inline-block;
+    }
+
+    .subtext {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 420px;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .hero-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      padding: 7px 11px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric strong {
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn-primary {
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4f46e5, #22c55e);
+      color: #f9fafb;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 18px 35px rgba(79, 70, 229, 0.55);
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary span {
+      font-size: 16px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 45px rgba(79, 70, 229, 0.8);
+    }
+
+    .btn-secondary {
+      padding: 9px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary span {
+      font-size: 18px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 1);
+      border-color: rgba(148, 163, 184, 0.7);
+      transform: translateY(-0.5px);
+    }
+
+    .hero-footnote {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Right hero (card) */
+    .hero-card {
+      background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.3) 0, rgba(15, 23, 42, 0.08) 42%),
+                  radial-gradient(circle at 100% 0, rgba(129, 140, 248, 0.28) 0, rgba(15, 23, 42, 0.08) 48%),
+                  #020617;
+      border-radius: 28px;
+      padding: 16px 16px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .hero-card-tabs {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      gap: 3px;
+    }
+
+    .hero-card-tab {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .hero-card-tab.active {
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+    }
+
+    .hero-card-badge {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: rgba(34, 197, 94, 0.14);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #bbf7d0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hero-card-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 768px) {
+      .hero-card-main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-roster {
+      background: rgba(15, 23, 42, 0.94);
+      border-radius: 18px;
+      padding: 10px 10px 8px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-roster-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .hero-roster-title {
+      font-size: 12px;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .hero-roster-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .hero-roster-tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      color: #a5b4fc;
+      background: rgba(79, 70, 229, 0.14);
+      border: 1px solid rgba(79, 70, 229, 0.7);
+    }
+
+    .hero-roster-list {
+      margin-top: 4px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(31, 41, 55, 0.85);
+      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.28) 0, rgba(15, 23, 42, 0.9) 48%);
+    }
+
+    .hero-roster-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1.4fr;
+      padding: 7px 10px;
+      font-size: 11px;
+      align-items: center;
+      color: #e5e7eb;
+    }
+
+    .hero-roster-row:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .hero-roster-row:nth-child(even) {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .hero-roster-row span.status-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-present {
+      background: rgba(34, 197, 94, 0.14);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.55);
+    }
+
+    .status-absent {
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.55);
+    }
+
+    .status-late {
+      background: rgba(251, 191, 36, 0.14);
+      color: #fef3c7;
+      border: 1px solid rgba(251, 191, 36, 0.6);
+    }
+
+    .hero-roster-foot {
+      margin-top: 7px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .hero-roster-foot strong {
+      color: #e5e7eb;
+    }
+
+    /* Side panel: insights */
+    .hero-insights {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      padding: 10px 10px 9px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-insights-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hero-insights-header-title {
+      font-size: 12px;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .hero-insights-header-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .hero-insights-chip {
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: rgba(39, 39, 42, 0.8);
+      border: 1px solid rgba(82, 82, 91, 0.9);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-insights-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .hero-insights-box {
+      padding: 8px 9px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 0 0, rgba(249, 115, 22, 0.3) 0, rgba(24, 24, 27, 0.96) 55%);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 11px;
+      color: #e5e7eb;
+    }
+
+    .hero-insights-box:nth-child(2) {
+      background: radial-gradient(circle at 100% 0, rgba(59, 130, 246, 0.32) 0, rgba(24, 24, 27, 0.96) 55%);
+    }
+
+    .hero-insights-label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .hero-insights-value {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .hero-insights-trend {
+      font-size: 10px;
+      color: #bbf7d0;
+    }
+
+    .hero-insights-footer {
+      margin-top: 4px;
+      padding: 7px 8px;
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px dashed rgba(55, 65, 81, 0.9);
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-insights-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #22c55e 0, #16a34a 60%, #15803d 100%);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 8px;
+      font-size: 10px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="brand-logo-inner">ST</div>
+        </div>
+        <div>
+          <div class="brand-text-title">SmartTrack AI</div>
+          <div class="brand-text-sub">Smart attendance for modern classrooms</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="pill">
+          <span class="pill-dot"></span>
+          Live demo · Teacher view
+        </div>
+        <a href="/login" class="btn-ghost">
+          Login
+          <span>→</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <!-- Left: copy -->
+      <section>
+        <div class="eyebrow">
+          <span class="eyebrow-label">AI‑assisted attendance</span>
+          <span>Built for campus workflows like yours</span>
+        </div>
+
+        <h1 class="headline">
+          <span>Turn messy</span><br>
+          <span class="headline-gradient">attendance into live insights.</span>
+        </h1>
+
+        <p class="subtext">
+          SmartTrack AI replaces paper registers with a live, section‑wise dashboard. Teachers get one‑click snapshots, students get clear history, and your data stays organized.
+        </p>
+
+        <div class="hero-metrics">
+          <div class="metric">
+            <strong>2 views</strong>
+            <span>teacher + student dashboards</span>
+          </div>
+          <div class="metric">
+            <strong>Face‑ready</strong>
+            <span>profile photos stored per student</span>
+          </div>
+          <div class="metric">
+            <strong>Zero Excel</strong>
+            <span>all sections in one place</span>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="/login" class="btn-primary">
+            Get started · Login
+            <span>↗</span>
+          </a>
+          <a href="/teacher" class="btn-secondary">
+            Open teacher demo
+            <span>▢</span>
+          </a>
+        </div>
+
+        <p class="hero-footnote">
+          No auth wired yet – login/teacher routes are demo‑ready so you can plug in real signup and face identity later.
+        </p>
+      </section>
+
+      <!-- Right: visual card -->
+      <aside class="hero-card">
+        <div class="hero-card-header">
+          <div class="hero-card-tabs">
+            <div class="hero-card-tab active">Teacher snapshot</div>
+            <div class="hero-card-tab">Student profile</div>
+          </div>
+          <div class="hero-card-badge">
+            <span>●</span>
+            Live section: AIML‑C
+          </div>
+        </div>
+
+        <div class="hero-card-main">
+          <!-- Roster -->
+          <div class="hero-roster">
+            <div class="hero-roster-header">
+              <div>
+                <div class="hero-roster-title">Today · Python Lab</div>
+                <div class="hero-roster-sub">Section AIML‑C · 24 Jan 2026</div>
+              </div>
+              <div class="hero-roster-tag">Quick save snapshot</div>
+            </div>
+
+            <div class="hero-roster-list">
+              <div class="hero-roster-row">
+                <span>20 · Detroit</span>
+                <span>Face match</span>
+                <span class="status-pill status-present">Present · 09:01</span>
+              </div>
+              <div class="hero-roster-row">
+                <span>21 · Sana</span>
+                <span>Manual override</span>
+                <span class="status-pill status-absent">Absent</span>
+              </div>
+              <div class="hero-roster-row">
+                <span>22 · Rahul</span>
+                <span>Face match</span>
+                <span class="status-pill status-late">Late · 09:07</span>
+              </div>
+            </div>
+
+            <div class="hero-roster-foot">
+              <span><strong>18/24</strong> marked · synced to history</span>
+              <span>Tap to drill into per‑student details →</span>
+            </div>
+          </div>
+
+          <!-- Insights -->
+          <div class="hero-insights">
+            <div class="hero-insights-header">
+              <div>
+                <div class="hero-insights-header-title">Section health</div>
+                <div class="hero-insights-header-sub">Today vs last 7 days</div>
+              </div>
+              <div class="hero-insights-chip">
+                <span>⚡</span>
+                AI‑ready signals
+              </div>
+            </div>
+
+            <div class="hero-insights-metrics">
+              <div class="hero-insights-box">
+                <div class="hero-insights-label">Overall attendance</div>
+                <div class="hero-insights-value">88%</div>
+                <div class="hero-insights-trend">+6% vs last week</div>
+              </div>
+              <div class="hero-insights-box">
+                <div class="hero-insights-label">Chronic absentees</div>
+                <div class="hero-insights-value">3 students</div>
+                <div class="hero-insights-trend">Flagged for follow‑up</div>
+              </div>
+            </div>
+
+            <div class="hero-insights-footer">
+              <span class="hero-insights-dot"></span>
+              <span>Every mark is stored against the student, so profiles can show history and photo identity in one place.</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>SmartTrack AI · Demo build · AIML project</span>
+      <div class="footer-links">
+        <a href="/teacher">Teacher view</a>
+        <a href="/login">Login</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
