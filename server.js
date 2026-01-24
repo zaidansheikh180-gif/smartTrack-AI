@@ -88,7 +88,7 @@ app.get('/api/sessions', (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to.fetch sessions' });
+    res.status(500).json({ error: 'Failed to fetch sessions' });
   }
 });
 
@@ -171,7 +171,7 @@ app.post('/api/students', (req, res) => {
     }
 
     const existing = db.prepare(`
-      SELECT id FROM.students WHERE roll_number = ? AND section = ?
+      SELECT id FROM students WHERE roll_number = ? AND section = ?
     `).get(rollNumber, section);
 
     if (existing) {

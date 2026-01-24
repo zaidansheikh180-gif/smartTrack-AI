@@ -1,0 +1,4 @@
+node_modules/
+smarttrack.db
+smarttrack.db-shm
+smarttrack.db-wal
