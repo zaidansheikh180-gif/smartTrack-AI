@@ -2,84 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SmartTrack Attendance – Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmartTrack – Teacher Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #050816;
-      --card: rgba(15, 23, 42, 0.9);
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.15);
-      --accent-strong: rgba(34, 197, 94, 0.35);
-      --accent-text: #bbf7d0;
-      --danger: #f97373;
-      --danger-soft: rgba(248, 113, 113, 0.15);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border-subtle: rgba(148, 163, 184, 0.35);
-      --pill-present: rgba(34, 197, 94, 0.18);
-      --pill-absent: rgba(248, 113, 113, 0.18);
-      --pill-late: rgba(234, 179, 8, 0.18);
+      --bg: #020617;
+      --card: #020617;
+      --card-soft: #020617;
+      --accent: #6366f1;
+      --accent-2: #22c55e;
+      --accent-soft: rgba(99, 102, 241, 0.18);
+      --border: #1f2937;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+      --radius-xl: 18px;
+      --radius-full: 999px;
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.92);
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0b1220 0, #020617 38%, #000 100%);
-      color: var(--text-main);
+      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+      color: var(--text);
       display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 16px;
+      flex-direction: column;
     }
 
-    .app-shell {
-      width: 100%;
-      max-width: 1180px;
-      max-height: 720px;
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 50%),
-        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 55%),
-        linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.98));
-      box-shadow:
-        0 26px 60px rgba(15, 23, 42, 0.95),
-        0 0 0 1px rgba(15, 23, 42, 0.7);
-      display: grid;
-      grid-template-columns: 290px minmax(0, 1fr);
-      overflow: hidden;
-      position: relative;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    .app-shell::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.14), transparent 50%),
-        radial-gradient(circle at 90% 100%, rgba(34, 197, 94, 0.1), transparent 45%);
-      opacity: 0.9;
-      pointer-events: none;
-      mix-blend-mode: screen;
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px 16px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    header.app-header {
-      grid-column: 1 / -1;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-      padding: 10px 18px 10px 16px;
+    /* Header */
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: relative;
-      background: linear-gradient(90deg, rgba(15, 23, 42, 0.97), rgba(15, 23, 42, 0.92));
-      backdrop-filter: blur(20px);
-      z-index: 1;
+      gap: 16px;
     }
 
     .brand {
@@ -88,2226 +64,1133 @@
       gap: 10px;
     }
 
-    .brand-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 30% 0%, #22c55e, transparent 55%),
-        radial-gradient(circle at 70% 110%, #0ea5e9, transparent 60%);
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, #4f46e5, #22c55e, #06b6d4, #4f46e5);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow:
-        0 0 0 1px rgba(34, 197, 94, 0.55),
-        0 0 18px rgba(34, 197, 94, 0.55);
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(79, 70, 229, 0.8);
     }
 
-    .brand-mark::after {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border-radius: inherit;
-      border: 1px solid rgba(15, 23, 42, 0.4);
-      background: radial-gradient(circle at 30% 0%, rgba(15, 23, 42, 0.2), transparent 60%);
-    }
-
-    .brand-initial {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #ecfeff;
-      position: relative;
-      z-index: 1;
-      text-shadow: 0 0 10px rgba(15, 23, 42, 0.9);
-    }
-
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand-title {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: #e5f9ff;
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: var(--text-muted);
+    .brand-logo-inner {
+      width: 23px;
+      height: 23px;
+      border-radius: 9px;
+      background: radial-gradient(circle at 20% 0%, #e5e7eb 0, #020617 60%, #020617 100%);
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
     }
 
-    .pill {
-      font-size: 10px;
+    .brand-text-title {
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: #e5f9ff;
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow:
-        0 0 0 4px rgba(34, 197, 94, 0.18),
-        0 0 18px rgba(34, 197, 94, 0.75);
-    }
-
-    .status-text {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #bbf7d0;
-    }
-
-    .avatar {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #22c55e, #0ea5e9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: #ecfeff;
-      box-shadow:
-        0 0 0 2px rgba(15, 23, 42, 0.9),
-        0 0 12px rgba(15, 23, 42, 0.9);
-    }
-
-    main {
-      display: contents;
-    }
-
-    aside.panel {
-      padding: 14px 14px 14px 16px;
-      border-right: 1px solid rgba(148, 163, 184, 0.3);
-      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.98));
-      backdrop-filter: blur(22px);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.18), transparent 55%),
-        radial-gradient(circle at 0% 100%, rgba(34, 197, 94, 0.12), transparent 60%);
-      opacity: 0.9;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .panel-header {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .panel-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .panel-title {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #e5f9ff;
-    }
-
-    .panel-tag {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      padding: 2px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-    }
-
-    .panel-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .class-meta {
-      position: relative;
-      z-index: 1;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96));
-      display: flex;
-      flex-direction: column;
       gap: 8px;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.85);
+      flex-wrap: wrap;
     }
 
-    .class-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .class-main {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .class-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #e5f9ff;
-    }
-
-    .class-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .class-pill-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .class-pill {
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.55);
-      color: #e5f9ff;
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .glow-orbit {
-      position: absolute;
-      right: -12px;
-      top: -6px;
-      width: 80px;
-      height: 80px;
-      border-radius: 999px;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.95),
-        0 0 35px rgba(56, 189, 248, 0.4);
-      opacity: 0.4;
-      transform: rotate(-12deg);
-    }
-
-    .info-line {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .info-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
-      margin-top: 3px;
-    }
-
-    .info-text {
-      flex: 1;
-    }
-
-    .input-grid {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .field-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      flex: 1;
-    }
-
-    .field-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
-
-    .field-input {
-      font-size: 12px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-main);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    }
-
-    .field-input:focus {
-      border-color: var(--accent);
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 1),
-        0 0 14px rgba(34, 197, 94, 0.4);
-      background: rgba(15, 23, 42, 0.98);
-    }
-
-    .date-pill {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.7);
-      color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.92);
-    }
-
-    .button-row {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      font-size: 12px;
-      padding: 7px 10px;
+    .pill {
+      padding: 6px 11px;
+      border-radius: var(--radius-full);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 6px;
-      cursor: pointer;
-     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      white-space: nowrap;
+      color: var(--muted);
+      font-size: 11px;
     }
 
-    .btn-primary {
-      background: radial-gradient(circle at 30% 0%, #22c55e, #166534);
-      color: #ecfdf5;
-      box-shadow:
-        0 10px 25px rgba(22, 163, 74, 0.65),
-        0 0 0 1px rgba(15, 23, 42, 1);
-      border: 1px solid rgba(74, 222, 128, 0.7);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-0.5px);
-      box-shadow:
-        0 12px 28px rgba(22, 163, 74, 0.75),
-        0 0 0 1px rgba(15, 23, 42, 1);
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #22c55e 0, #16a34a 60%, #15803d 100%);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
     }
 
     .btn-ghost {
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(148, 163, 184, 0.3);
       background: rgba(15, 23, 42, 0.9);
-      color: var(--text-main);
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-ghost span {
+      font-size: 14px;
+      opacity: 0.9;
     }
 
     .btn-ghost:hover {
+      border-color: rgba(148, 163, 184, 0.6);
       background: rgba(15, 23, 42, 1);
-      border-color: rgba(148, 163, 184, 0.95);
       transform: translateY(-0.5px);
     }
 
-    .btn-outline {
-      background: transparent;
-      color: var(--text-main);
-      border: 1px solid rgba(148, 163, 184, 0.8);
+    @media (max-width: 720px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
 
-    .btn-outline:hover {
-      background: rgba(15, 23, 42, 0.9);
+    /* Layout */
+    .teacher-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.15fr);
+      gap: 18px;
+      align-items: flex-start;
     }
 
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-main);
-      border: 1px solid rgba(148, 163, 184, 0.9);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.9);
+    @media (max-width: 960px) {
+      .teacher-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
-    .btn-secondary:hover {
-      background: rgba(15, 23, 42, 1);
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    .btn-icon {
+    /* Cards */
+    .card {
+      border-radius: var(--radius-xl);
+      padding: 14px 14px 12px;
+      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.2) 0, rgba(15, 23, 42, 0.98) 48%);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-soft {
+      border-radius: var(--radius-xl);
+      padding: 12px 12px 10px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
       font-size: 14px;
-    }
-
-    .shortcut-hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .keycap {
-      border-radius: 6px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      padding: 1px 5px;
-      font-size: 10px;
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-main);
-    }
-
-    .recent-box {
-      position: relative;
-      z-index: 1;
-      margin-top: 10px;
-      padding: 8px 9px;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.98));
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.9);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .recent-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .recent-title {
-      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
     }
 
-    .recent-chip {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      color: var(--text-main);
-    }
-
-    .recent-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 150px;
-      overflow: auto;
-      padding-right: 2px;
-    }
-
-    .recent-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
+    .card-subtitle {
       font-size: 11px;
-      padding: 4px 6px;
-      border-radius: 8px;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(30, 64, 175, 0.6);
-      align-items: center;
-    }
-
-    .recent-main {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .recent-line1 {
-      font-size: 11px;
-      color: #e5f9ff;
-    }
-
-    .recent-line2 {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .recent-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .recent-tag {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.96);
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    section.main-pane {
-      padding: 14px 16px 16px 14px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .main-pane::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.2), transparent 55%),
-        radial-gradient(circle at 100% 60%, rgba(34, 197, 94, 0.1), transparent 65%);
-      opacity: 0.9;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .main-header {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .main-title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .main-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #e5f9ff;
-    }
-
-    .main-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .main-metrics {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .metric-pill {
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-    }
-
-    .metric-pill strong {
-      color: var(--accent-text);
-      font-weight: 600;
-      margin-right: 4px;
-    }
-
-    .table-shell {
-      position: relative;
-      z-index: 1;
+      color: var(--muted);
       margin-top: 2px;
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: linear-gradient(150deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-      box-shadow:
-        0 18px 38px rgba(15, 23, 42, 0.95),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      max-height: 520px;
-    }
-
-    .table-header {
-      padding: 8px 10px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: linear-gradient(90deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
-    }
-
-    .table-header-title {
-      font-size: 12px;
-      font-weight: 500;
-      color: #e5f9ff;
-    }
-
-    .table-header-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .table-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .chip {
-      font-size: 10px;
-      padding: 2px 6px;
+      padding: 4px 9px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.96);
-      color: var(--text-muted);
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      white-space: nowrap;
     }
 
-    .table-scroll {
-      overflow: auto;
-      flex: 1;
+    .chip-green {
+      border-color: rgba(34, 197, 94, 0.7);
+      background: rgba(22, 163, 74, 0.16);
+      color: #bbf7d0;
+    }
+
+    .chip-soft {
+      border-color: rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+    }
+
+    /* Current class header card */
+    .class-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .class-meta-item {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .class-meta-item strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .class-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .class-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .class-main-label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .class-main-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .btn-snapshot {
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: linear-gradient(135deg, #4f46e5, #22c55e);
+      color: #f9fafb;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      box-shadow: 0 18px 30px rgba(79, 70, 229, 0.7);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-snapshot span {
+      font-size: 14px;
+    }
+
+    .btn-snapshot:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 40px rgba(79, 70, 229, 0.85);
+    }
+
+    @media (max-width: 520px) {
+      .class-top-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .btn-snapshot {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Roster table */
+    .table-wrapper {
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      overflow: hidden;
+      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.28) 0, rgba(15, 23, 42, 0.98) 48%);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
-      min-width: 100%;
     }
 
     thead {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background: linear-gradient(90deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      background: rgba(15, 23, 42, 0.98);
     }
 
-    th,
-    td {
-      padding: 7px 8px;
-      border-bottom: 1px solid rgba(30, 64, 175, 0.65);
+    th, td {
+      padding: 7px 10px;
       text-align: left;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
       white-space: nowrap;
     }
 
     th {
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.96);
+      letter-spacing: 0.06em;
+      color: var(--muted);
     }
 
     tbody tr:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.94);
     }
 
-    tbody tr:hover {
-      background: rgba(15, 23, 42, 0.98);
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.99);
     }
 
     .status-select {
-      font-size: 11px;
-      padding: 4px 7px;
+      width: 100%;
+      padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.75);
-      background: rgba(15, 23, 42, 0.98);
-      color: var(--text-main);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+      font-size: 11px;
       outline: none;
     }
 
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
-      border-radius: 999px;
+    .roster-footer {
+      padding: 7px 10px;
       font-size: 11px;
-      border: 1px solid transparent;
-    }
-
-    .status-pill.present {
-      background: var(--pill-present);
-      border-color: rgba(34, 197, 94, 0.6);
-      color: #bbf7d0;
-    }
-
-    .status-pill.absent {
-      background: var(--pill-absent);
-      border-color: rgba(248, 113, 113, 0.8);
-      color: #fecaca;
-    }
-
-    .status-pill.late {
-      background: var(--pill-late);
-      border-color: rgba(234, 179, 8, 0.7);
-      color: #fef3c7;
-    }
-
-    .status-dot-pill {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: currentColor;
-    }
-
-    .empty-state {
-      padding: 18px 14px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(12px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 40;
-    }
-
-    .modal-backdrop.visible {
+      color: var(--muted);
       display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .modal {
-      width: 100%;
-      max-width: 780px;
-      max-height: 80vh;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.15), transparent 50%),
-        linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-      box-shadow:
-        0 26px 70px rgba(15, 23, 42, 0.95),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
+    .roster-footer strong {
+      color: #e5e7eb;
+    }
+
+    /* Manage students */
+    .fields-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .field {
+      flex: 1 1 120px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      gap: 4px;
+      font-size: 11px;
     }
 
-    .modal-header {
-      padding: 10px 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
-      display: flex;
+    .field label {
+      color: var(--muted);
+    }
+
+    .field input {
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field input::placeholder {
+      color: #4b5563;
+    }
+
+    .field input:focus {
+      border-color: rgba(129, 140, 248, 0.95);
+      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.6);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .btn-small {
+      margin-top: 8px;
+      padding: 7px 11px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: rgba(15, 23, 42, 1);
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
       align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(75, 85, 99, 0.95);
+      transition: all 0.15s ease;
+    }
+
+    .btn-small span {
+      font-size: 13px;
+    }
+
+    .btn-small:hover {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(148, 163, 184, 0.9);
+      transform: translateY(-0.5px);
+    }
+
+    .students-list {
+      margin-top: 10px;
+      max-height: 240px;
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      background: rgba(15, 23, 42, 0.98);
+      font-size: 12px;
+    }
+
+    .students-row {
+      padding: 6px 9px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.95);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #e5e7eb;
+    }
+
+    .students-row:last-child {
+      border-bottom: none;
+    }
+
+    .students-row span.meta {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* Sessions */
+    .sessions-list {
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      background: rgba(15, 23, 42, 0.98);
+      max-height: 260px;
+      overflow: auto;
+      font-size: 12px;
+    }
+
+    .session-row {
+      padding: 7px 9px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .session-row:last-child {
+      border-bottom: none;
+    }
+
+    .session-main {
+      display: flex;
       justify-content: space-between;
       gap: 10px;
     }
 
-    .modal-title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .session-main-title {
+      font-weight: 500;
     }
 
-    .modal-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #e5f9ff;
-    }
-
-    .modal-subtitle {
+    .session-main-meta {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
-    .modal-meta-row {
+    .session-extra {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .session-row:hover {
+      background: rgba(17, 24, 39, 0.96);
+    }
+
+    .sessions-empty {
+      padding: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .subcard-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .subcard-header strong {
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+
+    .tag-pill {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.95);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .footer {
+      margin-top: 4px;
+      font-size: 10px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
-    .modal-chip {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-muted);
-    }
-
-    .modal-body {
-      padding: 10px 12px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: hidden;
-    }
-
-    .modal-table-shell {
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.98);
-      overflow: hidden;
-      max-height: 52vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-table-scroll {
-      overflow: auto;
-      flex: 1;
-    }
-
-    .modal-footer {
-      padding: 8px 12px 10px;
-      border-top: 1px solid rgba(148, 163, 184, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .badge-present {
-      color: #bbf7d0;
-    }
-
-    .badge-absent {
-      color: #fecaca;
-    }
-
-    .badge-late {
-      color: #fef3c7;
-    }
-
-    .manage-panel-backdrop {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: stretch;
-      justify-content: flex-end;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(8px);
-      z-index: 35;
-    }
-
-    .manage-panel-backdrop.visible {
-      display: flex;
-    }
-
-    .manage-panel {
-      width: 360px;
-      max-width: 100%;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-      border-left: 1px solid rgba(148, 163, 184, 0.7);
-      box-shadow:
-        -18px 0 40px rgba(15, 23, 42, 0.95),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .manage-header {
-      padding: 10px 12px 8px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .manage-title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .manage-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #e5f9ff;
-    }
-
-    .manage-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .manage-body {
-      padding: 9px 12px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: hidden;
-    }
-
-    .manage-form {
-      padding: 8px 9px;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.55);
-      background: rgba(15, 23, 42, 0.98);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .manage-form-row {
-      display: flex;
-      gap: 6px;
-    }
-
-    .manage-list-shell {
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.55);
-      background: rgba(15, 23, 42, 0.98);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      max-height: 50vh;
-    }
-
-    .manage-list-header {
-      padding: 6px 8px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .manage-list-scroll {
-      overflow: auto;
-      flex: 1;
-    }
-
-    .manage-list-empty {
-      padding: 12px 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .manage-student-row {
-      padding: 5px 8px;
-      border-bottom: 1px solid rgba(30, 64, 175, 0.5);
-      font-size: 11px;
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .manage-student-main {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-
-    .manage-student-line1 {
-      color: #e5f9ff;
-    }
-
-    .manage-student-line2 {
-      color: var(--text-muted);
-      font-size: 10px;
-    }
-
-    .manage-count-label {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    @media (max-width: 960px) {
-      body {
-        padding: 8px;
-      }
-
-      .app-shell {
-        grid-template-columns: 1fr;
-        max-height: none;
-      }
-
-      aside.panel {
-        display: none;
-      }
-
-      header.app-header {
-        padding-inline: 12px;
-      }
-
-      .table-shell {
-        max-height: none;
-      }
-    }
-
-    @media (max-width: 640px) {
-      header.app-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .main-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .table-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .modal {
-        max-width: 100%;
-        margin-inline: 8px;
-      }
-
-      .manage-panel {
-        width: 100%;
-      }
+    .footer a {
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="app-header">
+  <div class="page">
+    <header class="header">
       <div class="brand">
-        <div class="brand-mark">
-          <span class="brand-initial">ST</span>
+        <div class="brand-logo">
+          <div class="brand-logo-inner">ST</div>
         </div>
-        <div class="brand-text">
-          <div class="brand-title">SmartTrack</div>
-          <div class="brand-sub">
-            AI‑assisted attendance tracker
-            <span class="pill">Demo snapshot</span>
-          </div>
+        <div>
+          <div class="brand-text-title">SmartTrack AI</div>
+          <div class="brand-text-sub">Teacher dashboard · Live attendance</div>
         </div>
       </div>
       <div class="header-actions">
-        <div class="status-dot"></div>
-        <div class="status-text">Backend connected</div>
-        <div class="avatar">F</div>
+        <div class="pill">
+          <span class="pill-dot"></span>
+          Current session not yet saved
+        </div>
+        <a href="/" class="btn-ghost">
+          Landing
+          <span>↗</span>
+        </a>
+        <a href="/login" class="btn-ghost">
+          Login
+          <span>→</span>
+        </a>
       </div>
     </header>
 
-    <main>
-      <aside class="panel">
-        <div class="panel-header">
-          <div class="panel-title-row">
-            <div class="panel-title">Current class</div>
-            <div class="panel-tag">AIML · Bangalore</div>
-          </div>
-          <div class="panel-subtitle">
-            Configure the session then mark attendance in one view.
-          </div>
-        </div>
-
-        <div class="class-meta">
-          <div class="class-line">
-            <div class="class-main">
-              <div class="class-title" id="class-title-label">Python – AIML‑C</div>
-              <div class="class-sub" id="class-sub-label">SmartTrack snapshot for demo.</div>
-            </div>
-            <div class="glow-orbit"></div>
-          </div>
-          <div class="class-pill-row">
-            <span class="class-pill" id="class-teacher-pill">Teacher: Unknown</span>
-            <span class="class-pill" id="class-section-pill">Section: aiml‑c</span>
-          </div>
-        </div>
-
-        <div class="info-line">
-          <div class="info-dot"></div>
-          <div class="info-text">
-            Use the panel below to set teacher, subject and section, then load the roster and mark Present / Absent / Late.
-          </div>
-        </div>
-
-        <div class="input-grid">
-          <div class="field-row">
-            <div class="field">
-              <label class="field-label" for="teacherName">Teacher</label>
-              <input id="teacherName" class="field-input" placeholder="e.g. John Doe" />
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label class="field-label" for="subject">Subject</label>
-              <input id="subject" class="field-input" placeholder="e.g. Python" value="python" />
-            </div>
-            <div class="field">
-              <label class="field-label" for="section">Section</label>
-              <input id="section" class="field-input" placeholder="e.g. aiml-c" value="aiml-c" />
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label class="field-label" for="date">Date</label>
-              <input id="date" type="date" class="field-input" />
-            </div>
-            <div class="field">
-              <label class="field-label">Snapshot</label>
-              <div id="snapshotLabel" class="date-pill">No session yet</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button id="loadStudentsBtn" class="btn btn-secondary">
-            <span class="btn-icon">📥</span>
-            Load students for this section
-          </button>
-          <button id="saveSnapshotBtn" class="btn btn-primary">
-            <span class="btn-icon">💾</span>
-            Quick save snapshot
-          </button>
-          <div class="shortcut-hint">
-            <span class="keycap">Ctrl</span> + <span class="keycap">S</span> to save quickly
-          </div>
-          <button id="manageStudentsBtn" class="btn btn-ghost">
-            <span class="btn-icon">👥</span>
-            Manage students
-          </button>
-        </div>
-
-        <div class="recent-box">
-          <div class="recent-header">
-            <div class="recent-title">Recent sessions</div>
-            <div class="recent-chip" id="recent-count-label">0 saved</div>
-          </div>
-          <div id="recentSessionsList" class="recent-list">
-            <div class="recent-item">
-              <div class="recent-main">
-                <div class="recent-line1">No sessions yet</div>
-                <div class="recent-line2">Save attendance to see snapshots here.</div>
-              </div>
-              <div class="recent-right">
-                <span class="recent-tag">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <section class="main-pane">
-        <div class="main-header">
-          <div class="main-title-block">
-            <div class="main-title">Live roster</div>
-            <div class="main-subtitle">
-              Mark each student Present, Absent or Late. Saved snapshots show the frozen state later.
-            </div>
-          </div>
-          <div class="main-metrics">
-            <div class="metric-pill">
-              <strong id="metric-total">0</strong> students
-            </div>
-            <div class="metric-pill">
-              <strong id="metric-present">0</strong> present
-            </div>
-            <div class="metric-pill">
-              <strong id="metric-absent">0</strong> absent
-            </div>
-            <div class="metric-pill">
-              <strong id="metric-late">0</strong> late
-            </div>
-          </div>
-        </div>
-
-        <div class="table-shell">
-          <div class="table-header">
+    <main class="teacher-layout">
+      <!-- LEFT COLUMN: current class + roster -->
+      <section class="column">
+        <!-- Current class card -->
+        <section class="card">
+          <div class="card-header">
             <div>
-              <div class="table-header-title">Students in current section</div>
-              <div id="table-sub-label" class="table-header-sub">Load students to begin marking.</div>
+              <div class="card-title">Current class</div>
+              <div class="card-subtitle">
+                Fill in the details and mark each student. Then use “Quick save snapshot”.
+              </div>
             </div>
-            <div class="table-controls">
-              <span class="chip" id="section-chip">Section: —</span>
-              <span class="chip" id="subject-chip">Subject: —</span>
+            <div class="chip-soft">
+              <span>⚡</span>
+              Snapshot feeds sessions & history
             </div>
           </div>
-          <div class="table-scroll">
+
+          <div class="class-top-row">
+            <div class="class-title-block">
+              <div class="class-main-label" id="class-title-text">Python Lab</div>
+              <div class="class-main-sub" id="class-subtitle-text">
+                Section AIML-C · Today
+              </div>
+            </div>
+            <button class="btn-snapshot" id="save-session-btn">
+              Quick save snapshot
+              <span>▢</span>
+            </button>
+          </div>
+
+          <div class="class-meta">
+            <div class="class-meta-item">
+              <span>👩‍🏫</span>
+              <span><strong>Teacher:</strong> <span id="teacher-name-label">Your name</span></span>
+            </div>
+            <div class="class-meta-item">
+              <span>📘</span>
+              <span><strong>Subject:</strong> <span id="subject-label">Subject</span></span>
+            </div>
+            <div class="class-meta-item">
+              <span>🏷️</span>
+              <span><strong>Section:</strong> <span id="section-label">AIML-C</span></span>
+            </div>
+            <div class="class-meta-item">
+              <span>📅</span>
+              <span><strong>Date:</strong> <span id="date-label">Today</span></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Roster card -->
+        <section class="card-soft">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Live roster</div>
+              <div class="card-subtitle">
+                Adjust status per row before saving. New students will auto‑create in the database.
+              </div>
+            </div>
+            <div class="chip">
+              <span>🎯</span>
+              Mark Present · Absent · Late
+            </div>
+          </div>
+
+          <div class="table-wrapper">
             <table>
               <thead>
                 <tr>
-                  <th style="width: 48px;">#</th>
-                  <th>Name</th>
-                  <th>Roll</th>
-                  <th>Section</th>
-                  <th>Status</th>
+                  <th style="width: 10%;">Roll</th>
+                  <th style="width: 30%;">Name</th>
+                  <th style="width: 18%;">Section</th>
+                  <th style="width: 22%;">Status</th>
+                  <th style="width: 20%;">Notes</th>
                 </tr>
               </thead>
-              <tbody id="studentsTableBody">
-                <tr>
-                  <td colspan="5">
-                    <div class="empty-state">
-                      No students loaded yet. Set a section on the left and click “Load students”.
-                    </div>
-                  </td>
-                </tr>
+              <tbody id="roster-body">
+                <!-- Rows are dynamically managed in JS or pre-filled manually -->
               </tbody>
             </table>
+            <div class="roster-footer">
+              <span><strong id="roster-count">0</strong> students in this view</span>
+              <span>Use “Manage students” to fetch by section quickly.</span>
+            </div>
           </div>
-        </div>
+        </section>
+      </section>
+
+      <!-- RIGHT COLUMN: manage students + sessions -->
+      <section class="column">
+        <!-- Manage students -->
+        <section class="card-soft">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Manage students</div>
+              <div class="card-subtitle">
+                Add students or load a full section roster. Face photo URL is optional and for later AI.
+              </div>
+            </div>
+            <div class="chip-soft">
+              <span>👥</span>
+              Students table
+            </div>
+          </div>
+
+          <div class="fields-row">
+            <div class="field">
+              <label for="student-name-input">Name</label>
+              <input id="student-name-input" type="text" placeholder="e.g., Sana" />
+            </div>
+            <div class="field">
+              <label for="student-roll-input">Roll number</label>
+              <input id="student-roll-input" type="text" placeholder="e.g., 21" />
+            </div>
+          </div>
+          <div class="fields-row">
+            <div class="field">
+              <label for="student-section-input">Section</label>
+              <input id="student-section-input" type="text" placeholder="e.g., AIML-C" />
+            </div>
+            <div class="field">
+              <label for="student-photo-input">Photo URL (optional)</label>
+              <input id="student-photo-input" type="text" placeholder="https://..." />
+            </div>
+          </div>
+          <button class="btn-small" id="add-student-btn">
+            Add student
+            <span>＋</span>
+          </button>
+
+          <div class="subcard-header">
+            <span><strong>Section list</strong> · Students from a section</span>
+            <span class="tag-pill">Uses /api/students?section=…</span>
+          </div>
+
+          <div class="fields-row" style="margin-top: 6px;">
+            <div class="field">
+              <label for="filter-section-input">Section to load</label>
+              <input id="filter-section-input" type="text" placeholder="e.g., AIML-C" />
+            </div>
+            <button class="btn-small" id="load-section-btn" style="align-self: flex-end;">
+              Load section roster
+              <span>↓</span>
+            </button>
+          </div>
+
+          <div class="students-list" id="students-list">
+            <!-- Filled by JS from /api/students -->
+          </div>
+        </section>
+
+        <!-- Recent sessions -->
+        <section class="card-soft">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent sessions</div>
+              <div class="card-subtitle">
+                Click a session to inspect who was present, absent, or late.
+              </div>
+            </div>
+            <div class="chip-soft">
+              <span>📂</span>
+              Sessions history
+            </div>
+          </div>
+
+          <div class="sessions-list" id="sessions-list">
+            <div class="sessions-empty" id="sessions-empty">
+              No sessions yet – save a snapshot to see it appear here.
+            </div>
+          </div>
+
+          <div class="subcard-header">
+            <span><strong>Selected session</strong> · Details</span>
+            <span class="tag-pill">Uses /api/sessions/:id</span>
+          </div>
+
+          <div class="students-list" id="session-details">
+            <div class="sessions-empty">Select a session above to view its roster.</div>
+          </div>
+        </section>
       </section>
     </main>
-  </div>
 
-  <!-- Session details modal -->
-  <div id="session-modal-backdrop" class="modal-backdrop">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title-block">
-          <div class="modal-title" id="session-modal-title">Session details</div>
-          <div class="modal-subtitle" id="session-modal-subtitle">
-            Snapshot of students and statuses.
-          </div>
-          <div class="modal-meta-row">
-            <span class="modal-chip" id="session-modal-id">ID: —</span>
-            <span class="modal-chip" id="session-modal-subject">Subject: —</span>
-            <span class="modal-chip" id="session-modal-section">Section: —</span>
-            <span class="modal-chip" id="session-modal-date">Date: —</span>
-          </div>
-        </div>
-        <button id="session-modal-close" class="btn btn-outline">
-          ✕ Close
-        </button>
-      </div>
-      <div class="modal-body">
-        <div id="session-analytics-strip" style="display:flex; gap:8px; flex-wrap:wrap; font-size:11px; margin-bottom:6px;">
-          <div class="chip" id="session-analytics-total">Total: 0</div>
-          <div class="chip" id="session-analytics-present">Present: 0 (0%)</div>
-          <div class="chip" id="session-analytics-absent">Absent: 0 (0%)</div>
-          <div class="chip" id="session-analytics-late">Late: 0 (0%)</div>
-        </div>
-        <div class="modal-table-shell">
-          <div class="table-header" style="padding:6px 10px;">
-            <div class="table-header-title">Students & statuses</div>
-            <div class="table-header-sub" id="session-modal-count">
-              Loading…
-            </div>
-          </div>
-          <div class="modal-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width: 48px;">#</th>
-                  <th>Name</th>
-                  <th>Roll</th>
-                  <th>Section</th>
-                  <th>Status</th>
-                  <th>Marked at</th>
-                </tr>
-              </thead>
-              <tbody id="session-modal-tbody">
-                <tr>
-                  <td colspan="6">
-                    <div class="empty-state">
-                      Loading records…
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div>Session analytics computed from stored attendance.</div>
-        <div>
-          <span class="badge-present">● Present</span> ·
-          <span class="badge-absent">● Absent</span> ·
-          <span class="badge-late">● Late</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Student profile & history modal -->
-  <div id="student-modal-backdrop" class="modal-backdrop">
-    <div class="modal" style="max-width:640px;">
-      <div class="modal-header">
-        <div class="modal-title-block">
-          <div class="modal-title" id="student-modal-title">Student profile</div>
-          <div class="modal-subtitle" id="student-modal-subtitle">Attendance history across sessions.</div>
-        </div>
-        <button id="student-modal-close" class="btn btn-outline">
-          ✕ Close
-        </button>
-      </div>
-      <div class="modal-body" style="gap:10px;">
-        <div style="display:flex; gap:10px; align-items:center;">
-          <div id="student-modal-avatar" style="width:48px; height:48px; border-radius:999px; background:rgba(15,23,42,0.9); border:1px solid rgba(148,163,184,0.7); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:20px; font-weight:600;">
-            ?
-          </div>
-          <div style="display:flex; flex-direction:column; gap:2px;">
-            <div id="student-modal-name" style="font-size:14px; font-weight:600; color:#e5f9ff;">Name</div>
-            <div id="student-modal-meta" style="font-size:11px; color:#9ca3af;">Roll · Section</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px;">
-              <div class="chip" id="student-modal-total">Sessions: 0</div>
-              <div class="chip" id="student-modal-present">Present: 0 (0%)</div>
-              <div class="chip" id="student-modal-absent">Absent: 0 (0%)</div>
-              <div class="chip" id="student-modal-late">Late: 0 (0%)</div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-table-shell">
-          <div class="table-header" style="padding:6px 10px;">
-            <div class="table-header-title">History</div>
-            <div class="table-header-sub" id="student-modal-count">No sessions loaded.</div>
-          </div>
-          <div class="modal-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:40px;">#</th>
-                  <th>Date</th>
-                  <th>Subject</th>
-                  <th>Section</th>
-                  <th>Status</th>
-                  <th>Session</th>
-                </tr>
-              </thead>
-              <tbody id="student-modal-tbody">
-                <tr>
-                  <td colspan="6">
-                    <div class="empty-state">No history loaded.</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div>Per-student view built from attendance records.</div>
-        <div>
-          <span class="badge-present">● Present</span> ·
-          <span class="badge-absent">● Absent</span> ·
-          <span class="badge-late">● Late</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Manage students side panel -->
-  <div id="manage-panel-backdrop" class="manage-panel-backdrop">
-    <div class="manage-panel">
-      <div class="manage-header">
-        <div class="manage-title-block">
-          <div class="manage-title">Manage students</div>
-          <div class="manage-subtitle">Add or review students for a section.</div>
-        </div>
-        <button id="manage-close-btn" class="btn btn-outline">
-          ✕ Close
-        </button>
-      </div>
-      <div class="manage-body">
-        <div class="manage-form">
-          <div class="manage-form-row">
-            <div class="field">
-              <label class="field-label" for="manage-section-input">Section</label>
-              <input id="manage-section-input" class="field-input" placeholder="e.g. aiml-c" value="aiml-c" />
-            </div>
-            <div class="field" style="max-width:120px;">
-              <label class="field-label">&nbsp;</label>
-              <button id="manage-load-btn" class="btn btn-secondary" style="width:100%;">
-                Load
-              </button>
-            </div>
-          </div>
-          <div class="manage-form-row">
-            <div class="field">
-              <label class="field-label" for="manage-name-input">Name</label>
-              <input id="manage-name-input" class="field-input" placeholder="Student name" />
-            </div>
-          </div>
-          <div class="manage-form-row">
-            <div class="field">
-              <label class="field-label" for="manage-roll-input">Roll number</label>
-              <input id="manage-roll-input" class="field-input" placeholder="e.g. 01" />
-            </div>
-            <div class="field" style="max-width:120px;">
-              <label class="field-label">&nbsp;</label>
-              <button id="manage-add-btn" class="btn btn-primary" style="width:100%;">
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="manage-list-shell">
-          <div class="manage-list-header">
-            <div class="manage-count-label" id="manage-count-label">No students loaded.</div>
-          </div>
-          <div class="manage-list-scroll" id="manage-list">
-            <div class="manage-list-empty">
-              Load a section to see students here.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <footer class="footer">
+      <span>SmartTrack AI · Teacher view · Uses the same /api endpoints you wired in server.js.</span>
+      <span>
+        <a href="/">Landing</a> ·
+        <a href="/login">Login</a>
+      </span>
+    </footer>
   </div>
 
   <script>
-    const teacherInput = document.getElementById('teacherName');
-    const subjectInput = document.getElementById('subject');
-    const sectionInput = document.getElementById('section');
-    const dateInput = document.getElementById('date');
-    const snapshotLabel = document.getElementById('snapshotLabel');
+    // Basic front-end wiring to match the API contracts you already have.
 
-    const classTitleLabel = document.getElementById('class-title-label');
-    const classSubLabel = document.getElementById('class-sub-label');
-    const classTeacherPill = document.getElementById('class-teacher-pill');
-    const classSectionPill = document.getElementById('class-section-pill');
+    const teacherNameLabel = document.getElementById('teacher-name-label');
+    const subjectLabel = document.getElementById('subject-label');
+    const sectionLabel = document.getElementById('section-label');
+    const dateLabel = document.getElementById('date-label');
+    const classTitleText = document.getElementById('class-title-text');
+    const classSubtitleText = document.getElementById('class-subtitle-text');
+    const rosterBody = document.getElementById('roster-body');
+    const rosterCount = document.getElementById('roster-count');
+    const saveSessionBtn = document.getElementById('save-session-btn');
 
-    const sectionChip = document.getElementById('section-chip');
-    const subjectChip = document.getElementById('subject-chip');
-    const tableSubLabel = document.getElementById('table-sub-label');
-    const studentsTableBody = document.getElementById('studentsTableBody');
+    const addStudentBtn = document.getElementById('add-student-btn');
+    const loadSectionBtn = document.getElementById('load-section-btn');
 
-    const metricTotal = document.getElementById('metric-total');
-    const metricPresent = document.getElementById('metric-present');
-    const metricAbsent = document.getElementById('metric-absent');
-    const metricLate = document.getElementById('metric-late');
+    const studentNameInput = document.getElementById('student-name-input');
+    const studentRollInput = document.getElementById('student-roll-input');
+    const studentSectionInput = document.getElementById('student-section-input');
+    const studentPhotoInput = document.getElementById('student-photo-input');
+    const filterSectionInput = document.getElementById('filter-section-input');
+    const studentsList = document.getElementById('students-list');
 
-    const loadStudentsBtn = document.getElementById('loadStudentsBtn');
-    const saveSnapshotBtn = document.getElementById('saveSnapshotBtn');
+    const sessionsList = document.getElementById('sessions-list');
+    const sessionsEmpty = document.getElementById('sessions-empty');
+    const sessionDetails = document.getElementById('session-details');
 
-    const recentSessionsList = document.getElementById('recentSessionsList');
-    const recentCountLabel = document.getElementById('recent-count-label');
-
-    const manageStudentsBtn = document.getElementById('manageStudentsBtn');
-    const manageBackdrop = document.getElementById('manage-panel-backdrop');
-    const manageCloseBtn = document.getElementById('manage-close-btn');
-    const manageSectionInput = document.getElementById('manage-section-input');
-    const manageLoadBtn = document.getElementById('manage-load-btn');
-    const manageNameInput = document.getElementById('manage-name-input');
-    const manageRollInput = document.getElementById('manage-roll-input');
-    const manageAddBtn = document.getElementById('manage-add-btn');
-    const manageList = document.getElementById('manage-list');
-    const manageCountLabel = document.getElementById('manage-count-label');
-
-    const sessionModalBackdrop = document.getElementById('session-modal-backdrop');
-    const sessionModalClose = document.getElementById('session-modal-close');
-
-    const studentModalBackdrop = document.getElementById('student-modal-backdrop');
-    const studentModalClose = document.getElementById('student-modal-close');
-
-    let currentStudents = [];
-
-    function formatDateForInput(date) {
-      const year = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${year}-${m}-${d}`;
+    function todayISO() {
+      const d = new Date();
+      return d.toISOString().slice(0, 10);
     }
 
-    function updateClassHeader() {
-      const teacher = teacherInput.value || 'Unknown';
-      const subject = subjectInput.value || '—';
-      const section = sectionInput.value || '—';
-
-      classTitleLabel.textContent = `${subject} – ${section}`;
-      classSubLabel.textContent = 'SmartTrack snapshot for demo.';
-      classTeacherPill.textContent = `Teacher: ${teacher}`;
-      classSectionPill.textContent = `Section: ${section}`;
-
-      sectionChip.textContent = `Section: ${section}`;
-      subjectChip.textContent = `Subject: ${subject}`;
-    }
-
-    function updateMetrics() {
-      const total = currentStudents.length;
-      let present = 0, absent = 0, late = 0;
-      currentStudents.forEach(s => {
-        if (s.status === 'Present') present++;
-        else if (s.status === 'Absent') absent++;
-        else if (s.status === 'Late') late++;
+    function formatNiceDate(iso) {
+      if (!iso) return 'Today';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
       });
-      metricTotal.textContent = total;
-      metricPresent.textContent = present;
-      metricAbsent.textContent = absent;
-      metricLate.textContent = late;
     }
 
-    function renderStudentsTable() {
-      if (!studentsTableBody) return;
+    function initHeaderDefaults() {
+      const today = todayISO();
+      dateLabel.textContent = formatNiceDate(today);
+      classSubtitleText.textContent = `${sectionLabel.textContent} · ${formatNiceDate(today)}`;
+    }
 
-      if (!currentStudents.length) {
-        studentsTableBody.innerHTML = `
-          <tr>
-            <td colspan="5">
-              <div class="empty-state">
-                No students loaded yet. Set a section on the left and click “Load students”.
-              </div>
-            </td>
-          </tr>
-        `;
-        updateMetrics();
-        return;
-      }
+    // Roster helpers
+    function addRosterRow(roll, name, section, status = 'present', notes = '') {
+      const tr = document.createElement('tr');
 
-      let rows = '';
-      currentStudents.forEach((s, index) => {
-        const status = s.status || 'Present';
-        let statusClass = 'present';
-        if (status === 'Absent') statusClass = 'absent';
-        else if (status === 'Late') statusClass = 'late';
+      const tdRoll = document.createElement('td');
+      tdRoll.textContent = roll;
 
-        rows += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${s.name || ''}</td>
-            <td>${s.rollNumber || ''}</td>
-            <td>${s.section || ''}</td>
-            <td>
-              <select class="status-select" data-roll="${s.rollNumber}">
-                <option value="Present" ${status === 'Present' ? 'selected' : ''}>Present</option>
-                <option value="Absent" ${status === 'Absent' ? 'selected' : ''}>Absent</option>
-                <option value="Late" ${status === 'Late' ? 'selected' : ''}>Late</option>
-              </select>
-            </td>
-          </tr>
-        `;
+      const tdName = document.createElement('td');
+      tdName.textContent = name;
+
+      const tdSection = document.createElement('td');
+      tdSection.textContent = section;
+
+      const tdStatus = document.createElement('td');
+      const select = document.createElement('select');
+      select.className = 'status-select';
+      ['present', 'absent', 'late'].forEach((opt) => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt[0].toUpperCase() + opt.slice(1);
+        if (opt === status) option.selected = true;
+        select.appendChild(option);
       });
+      tdStatus.appendChild(select);
 
-      studentsTableBody.innerHTML = rows;
+      const tdNotes = document.createElement('td');
+      tdNotes.textContent = notes || '';
 
-      const selects = studentsTableBody.querySelectorAll('.status-select');
-      selects.forEach(sel => {
-        sel.addEventListener('change', (e) => {
-          const roll = sel.getAttribute('data-roll');
-          const value = sel.value;
-          const student = currentStudents.find(s => s.rollNumber === roll);
-          if (student) {
-            student.status = value;
-          }
-          updateMetrics();
+      tr.appendChild(tdRoll);
+      tr.appendChild(tdName);
+      tr.appendChild(tdSection);
+      tr.appendChild(tdStatus);
+      tr.appendChild(tdNotes);
+
+      rosterBody.appendChild(tr);
+      updateRosterCount();
+    }
+
+    function clearRoster() {
+      rosterBody.innerHTML = '';
+      updateRosterCount();
+    }
+
+    function updateRosterCount() {
+      const rows = rosterBody.querySelectorAll('tr');
+      rosterCount.textContent = rows.length;
+    }
+
+    function buildStudentsPayload() {
+      const rows = rosterBody.querySelectorAll('tr');
+      const students = [];
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        const roll = cells[0].textContent.trim();
+        const name = cells[1].textContent.trim();
+        const section = cells[2].textContent.trim();
+        const statusSelect = cells[3].querySelector('select');
+        const status = statusSelect ? statusSelect.value : 'present';
+        if (!roll || !name || !section) return;
+        students.push({
+          rollNumber: roll,
+          name,
+          section,
+          status
         });
       });
-
-      updateMetrics();
+      return students;
     }
 
-    async function loadStudentsForSection() {
-      const section = sectionInput.value.trim();
-      if (!section) {
-        alert('Enter a section first (e.g. aiml-c).');
-        return;
-      }
-      tableSubLabel.textContent = `Loading students for ${section}…`;
-      try {
-        const res = await fetch(`/api/students?section=${encodeURIComponent(section)}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch students from server');
-        }
-        const rows = await res.json();
-        if (!rows.length) {
-          currentStudents = [];
-          renderStudentsTable();
-          tableSubLabel.textContent = `No students found in section ${section}. Use “Manage students” to add them.`;
-          return;
-        }
-        currentStudents = rows.map(r => ({
-          name: r.name,
-          rollNumber: r.roll_number,
-          section: r.section,
-          status: 'Present'
-        }));
-        tableSubLabel.textContent = `Loaded ${currentStudents.length} students for ${section}.`;
-        renderStudentsTable();
-      } catch (err) {
-        console.error(err);
-        tableSubLabel.textContent = 'Error loading students.';
-        alert('Failed to load students from backend.');
-      }
-    }
-
-    async function saveSnapshot() {
-      if (!currentStudents.length) {
-        alert('Load students first before saving a snapshot.');
-        return;
-      }
-
-      const teacherName = teacherInput.value.trim();
-      const subject = subjectInput.value.trim();
-      const section = sectionInput.value.trim();
-      const date = dateInput.value;
-
-      if (!teacherName || !subject || !section || !date) {
-        alert('Fill teacher, subject, section and date before saving.');
-        return;
-      }
-
-      const payload = {
-        teacherName,
-        subject,
-        section,
-        date,
-        students: currentStudents.map(s => ({
-          name: s.name,
-          rollNumber: s.rollNumber,
-          status: s.status || 'Present'
-        }))
-      };
-
-      saveSnapshotBtn.disabled = true;
-      saveSnapshotBtn.textContent = 'Saving…';
-
-      try {
-        const res = await fetch('/api/attendance', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-          throw new Error('Failed to save attendance');
-        }
-
-        const data = await res.json();
-        const sessionId = data.sessionId;
-
-        snapshotLabel.textContent = `Saved session #${sessionId}`;
-        await loadRecentSessions();
-      } catch (err) {
-        console.error(err);
-        alert('Failed to save snapshot.');
-      } finally {
-        saveSnapshotBtn.disabled = false;
-        saveSnapshotBtn.textContent = 'Quick save snapshot';
-      }
-    }
-
-    async function loadRecentSessions() {
-      try {
-        const res = await fetch('/api/sessions');
-        if (!res.ok) {
-          throw new Error('Failed to fetch sessions');
-        }
-
-        const sessions = await res.json();
-        renderRecentSessions(sessions);
-      } catch (err) {
-        console.error(err);
-        renderRecentSessions([]);
-      }
-    }
-
-    function renderRecentSessions(sessions) {
-      if (!recentSessionsList) return;
-
-      if (!sessions.length) {
-        recentSessionsList.innerHTML = `
-          <div class="recent-item">
-            <div class="recent-main">
-              <div class="recent-line1">No sessions yet</div>
-              <div class="recent-line2">Save attendance to see snapshots here.</div>
-            </div>
-            <div class="recent-right">
-              <span class="recent-tag">—</span>
-            </div>
-          </div>
-        `;
-        recentCountLabel.textContent = '0 saved';
-        return;
-      }
-
-      recentCountLabel.textContent = `${sessions.length} saved`;
-
-      let html = '';
-      sessions.slice(0, 10).forEach(s => {
-        const label = `#${s.id} · ${s.subject} · ${s.section}`;
-        const dateText = s.date || s.created_at;
-        html += `
-          <div class="recent-item">
-            <div class="recent-main">
-              <div class="recent-line1">${label}</div>
-              <div class="recent-line2">${dateText}</div>
-            </div>
-            <div class="recent-right">
-              <button class="btn btn-outline" data-session-id="${s.id}">
-                View
-              </button>
-            </div>
-          </div>
-        `;
-      });
-
-      recentSessionsList.innerHTML = html;
-
-      const buttons = recentSessionsList.querySelectorAll('button[data-session-id]');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-session-id');
-          if (id) {
-            openSessionDetails(id);
-          }
-        });
-      });
-    }
-
-    function openSessionModal() {
-      if (!sessionModalBackdrop) return;
-      sessionModalBackdrop.classList.add('visible');
-    }
-
-    function closeSessionModal() {
-      if (!sessionModalBackdrop) return;
-      sessionModalBackdrop.classList.remove('visible');
-    }
-
-    async function openSessionDetails(id) {
-      const tbody = document.getElementById('session-modal-tbody');
-      const countEl = document.getElementById('session-modal-count');
-      if (tbody) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty-state">Loading records…</div>
-            </td>
-          </tr>
-        `;
-      }
-      if (countEl) countEl.textContent = 'Loading…';
-
-      openSessionModal();
-
-      try {
-        const res = await fetch(`/api/sessions/${encodeURIComponent(id)}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch session details');
-        }
-        const data = await res.json();
-        renderSessionDetails(data);
-      } catch (err) {
-        console.error(err);
-        if (tbody) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6">
-                <div class="empty-state">Error loading session from server.</div>
-              </td>
-            </tr>
-          `;
-        }
-        if (countEl) countEl.textContent = 'Error loading session.';
-      }
-    }
-
-    function renderSessionDetails(sessionData) {
-      const { session, records } = sessionData || {};
-      const titleEl = document.getElementById('session-modal-title');
-      const subtitleEl = document.getElementById('session-modal-subtitle');
-      const idEl = document.getElementById('session-modal-id');
-      const subjectEl = document.getElementById('session-modal-subject');
-      const sectionEl = document.getElementById('session-modal-section');
-      const dateEl = document.getElementById('session-modal-date');
-      const countEl = document.getElementById('session-modal-count');
-      const tbody = document.getElementById('session-modal-tbody');
-
-      const totalChip = document.getElementById('session-analytics-total');
-      const presentChip = document.getElementById('session-analytics-present');
-      const absentChip = document.getElementById('session-analytics-absent');
-      const lateChip = document.getElementById('session-analytics-late');
-
-      if (!session) {
-        if (titleEl) titleEl.textContent = 'Session not found';
-        if (subtitleEl) subtitleEl.textContent = 'This session could not be loaded.';
-        if (tbody) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6">
-                <div class="empty-state">No data available for this session.</div>
-              </td>
-            </tr>
-          `;
-        }
-        if (totalChip) totalChip.textContent = 'Total: 0';
-        if (presentChip) presentChip.textContent = 'Present: 0 (0%)';
-        if (absentChip) absentChip.textContent = 'Absent: 0 (0%)';
-        if (lateChip) lateChip.textContent = 'Late: 0 (0%)';
-        return;
-      }
-
-      if (titleEl) titleEl.textContent = `Session #${session.id}`;
-      if (subtitleEl) subtitleEl.textContent = `Snapshot for ${session.subject || 'Unknown'} · ${session.section || '—'}`;
-      if (idEl) idEl.textContent = `ID: ${session.id}`;
-      if (subjectEl) subjectEl.textContent = `Subject: ${session.subject || '—'}`;
-      if (sectionEl) sectionEl.textContent = `Section: ${session.section || '—'}`;
-      if (dateEl) dateEl.textContent = `Date: ${session.date || '—'}`;
-
-      const total = records?.length || 0;
-      let present = 0, absent = 0, late = 0;
-
-      (records || []).forEach((r) => {
-        const status = r.status || 'Present';
-        if (status === 'Present') present++;
-        else if (status === 'Absent') absent++;
-        else if (status === 'Late') late++;
-      });
-
-      const pct = (count) => total === 0 ? 0 : Math.round((count / total) * 100);
-
-      if (countEl) countEl.textContent = `${total} students saved in this session.`;
-      if (totalChip) totalChip.textContent = `Total: ${total}`;
-      if (presentChip) presentChip.textContent = `Present: ${present} (${pct(present)}%)`;
-      if (absentChip) absentChip.textContent = `Absent: ${absent} (${pct(absent)}%)`;
-      if (lateChip) lateChip.textContent = `Late: ${late} (${pct(late)}%)`;
-
-      if (!tbody) return;
-
-      if (!records || records.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty-state">No students were stored for this session.</div>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      let rows = '';
-      records.forEach((r, index) => {
-        const name = r.name || 'Student';
-        const roll = r.roll_number || r.rollNumber || '';
-        const section = r.section || '';
-        const status = r.status || 'Present';
-        const markedAt = r.marked_at || r.markedAt || '';
-
-        let statusClass = 'present';
-        if (status === 'Absent') statusClass = 'absent';
-        else if (status === 'Late') statusClass = 'late';
-
-        rows += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>
-              <button
-                type="button"
-                style="background:none;border:none;padding:0;margin:0;color:#bfdbfe;cursor:pointer;text-decoration:underline;font-size:12px;"
-                onclick="openStudentProfile('${roll}')"
-              >
-                ${name}
-              </button>
-            </td>
-            <td>${roll}</td>
-            <td>${section}</td>
-            <td>
-              <span class="status-pill ${statusClass}">
-                <span class="status-dot-pill"></span>
-                ${status}
-              </span>
-            </td>
-            <td>${markedAt}</td>
-          </tr>
-        `;
-      });
-
-      tbody.innerHTML = rows;
-    }
-
-    function openManagePanel() {
-      if (!manageBackdrop) return;
-      manageBackdrop.classList.add('visible');
-    }
-
-    function closeManagePanel() {
-      if (!manageBackdrop) return;
-      manageBackdrop.classList.remove('visible');
-    }
-
-    function setStudentAvatar(el, student) {
-      if (!el) return;
-      const url = student.photo_url || student.photoUrl;
-      if (url) {
-        el.innerHTML = '';
-        el.style.backgroundImage = `url('${url}')`;
-        el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = 'center';
-        return;
-      }
-      const name = student.name || '';
-      const initials = name
-        .split(' ')
-        .filter(Boolean)
-        .map(part => part[0]?.toUpperCase())
-        .join('')
-        .slice(0, 2) || '?';
-      el.style.backgroundImage = '';
-      el.textContent = initials;
-    }
-
-    function openStudentModal() {
-      if (!studentModalBackdrop) return;
-      studentModalBackdrop.classList.add('visible');
-    }
-
-    function closeStudentModal() {
-      if (!studentModalBackdrop) return;
-      studentModalBackdrop.classList.remove('visible');
-    }
-
-    function renderStudentHistory(data) {
-      const { student, history } = data || {};
-
-      const titleEl = document.getElementById('student-modal-title');
-      const subtitleEl = document.getElementById('student-modal-subtitle');
-      const avatarEl = document.getElementById('student-modal-avatar');
-      const nameEl = document.getElementById('student-modal-name');
-      const metaEl = document.getElementById('student-modal-meta');
-      const totalChip = document.getElementById('student-modal-total');
-      const presentChip = document.getElementById('student-modal-present');
-      const absentChip = document.getElementById('student-modal-absent');
-      const lateChip = document.getElementById('student-modal-late');
-      const countEl = document.getElementById('student-modal-count');
-      const tbody = document.getElementById('student-modal-tbody');
-
-      if (!student) {
-        if (titleEl) titleEl.textContent = 'Student not found';
-        if (tbody) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6">
-                <div class="empty-state">No history available.</div>
-              </td>
-            </tr>
-          `;
-        }
-        if (countEl) countEl.textContent = 'No sessions loaded.';
-        return;
-      }
-
-      if (titleEl) titleEl.textContent = `Profile · ${student.name}`;
-      if (subtitleEl) subtitleEl.textContent = 'Attendance across all sessions.';
-      if (nameEl) nameEl.textContent = student.name || 'Student';
-      if (metaEl) metaEl.textContent = `${student.roll_number || ''} · ${student.section || ''}`;
-      setStudentAvatar(avatarEl, student);
-
-      const total = history?.length || 0;
-      let present = 0, absent = 0, late = 0;
-      (history || []).forEach((h) => {
-        const status = h.status || 'Present';
-        if (status === 'Present') present++;
-        else if (status === 'Absent') absent++;
-        else if (status === 'Late') late++;
-      });
-      const pct = (c) => total === 0 ? 0 : Math.round((c / total) * 100);
-
-      if (totalChip) totalChip.textContent = `Sessions: ${total}`;
-      if (presentChip) presentChip.textContent = `Present: ${present} (${pct(present)}%)`;
-      if (absentChip) absentChip.textContent = `Absent: ${absent} (${pct(absent)}%)`;
-      if (lateChip) lateChip.textContent = `Late: ${late} (${pct(late)}%)`;
-      if (countEl) countEl.textContent = `${total} session(s) in history.`;
-
-      if (!tbody) return;
-
-      if (!history || history.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty-state">No history for this student yet.</div>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      let rows = '';
-      history.forEach((h, idx) => {
-        const date = h.date || '';
-        const subject = h.subject || '';
-        const section = h.section || '';
-        const status = h.status || 'Present';
-        const sessionId = h.session_id || h.sessionId || '';
-        let statusClass = 'present';
-        if (status === 'Absent') statusClass = 'absent';
-        else if (status === 'Late') statusClass = 'late';
-
-        rows += `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>${date}</td>
-            <td>${subject}</td>
-            <td>${section}</td>
-            <td>
-              <span class="status-pill ${statusClass}">
-                <span class="status-dot-pill"></span>
-                ${status}
-              </span>
-            </td>
-            <td>#${sessionId}</td>
-          </tr>
-        `;
-      });
-
-      tbody.innerHTML = rows;
-    }
-
-    async function openStudentProfile(roll) {
-      if (!roll) return;
-
-      const tbody = document.getElementById('student-modal-tbody');
-      const countEl = document.getElementById('student-modal-count');
-      if (tbody) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty-state">Loading history…</div>
-            </td>
-          </tr>
-        `;
-      }
-      if (countEl) countEl.textContent = 'Loading…';
-
-      openStudentModal();
-
-      try {
-        const res = await fetch(`/api/students/${encodeURIComponent(roll)}/history`);
-        if (!res.ok) {
-          if (tbody) {
-            tbody.innerHTML = `
-              <tr>
-                <td colspan="6">
-                  <div class="empty-state">Failed to load history from server.</div>
-                </td>
-              </tr>
-            `;
-          }
-          if (countEl) countEl.textContent = 'Error loading history.';
-          return;
-        }
-        const data = await res.json();
-        renderStudentHistory(data);
-      } catch (err) {
-        console.error(err);
-        if (tbody) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6">
-                <div class="empty-state">Network error while loading history.</div>
-              </td>
-            </tr>
-          `;
-        }
-        if (countEl) countEl.textContent = 'Error loading history.';
-      }
-    }
-
-    async function loadManageList(section) {
-      try {
-        const res = await fetch(`/api/students?section=${encodeURIComponent(section)}`);
-        if (!res.ok) throw new Error('Failed to fetch students');
-        const rows = await res.json();
-
-        if (!rows.length) {
-          manageList.innerHTML = `
-            <div class="manage-list-empty">
-              No students found in section ${section}. Add one above.
-            </div>
-          `;
-          manageCountLabel.textContent = '0 students in this section.';
-          return;
-        }
-
-        let html = '';
-        rows.forEach(r => {
-          html += `
-            <div class="manage-student-row">
-              <div class="manage-student-main">
-                <div class="manage-student-line1">${r.name}</div>
-                <div class="manage-student-line2">${r.roll_number} · ${r.section}</div>
-              </div>
-            </div>
-          `;
-        });
-        manageList.innerHTML = html;
-        manageCountLabel.textContent = `${rows.length} student(s) in section ${section}.`;
-      } catch (err) {
-        console.error(err);
-        manageList.innerHTML = `
-          <div class="manage-list-empty">
-            Error loading students from backend.
-          </div>
-        `;
-        manageCountLabel.textContent = 'Error loading.';
-      }
-    }
-
+    // Manage students panel
     async function addStudent() {
-      const name = manageNameInput.value.trim();
-      const roll = manageRollInput.value.trim();
-      const section = manageSectionInput.value.trim();
+      const name = studentNameInput.value.trim();
+      const rollNumber = studentRollInput.value.trim();
+      const section = studentSectionInput.value.trim();
+      const photoUrl = studentPhotoInput.value.trim();
 
-      if (!name || !roll || !section) {
-        alert('Fill name, roll and section.');
+      if (!name || !rollNumber || !section) {
+        alert('Please fill name, roll, and section.');
         return;
       }
-
-      manageAddBtn.disabled = true;
-      manageAddBtn.textContent = 'Adding…';
 
       try {
         const res = await fetch('/api/students', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, rollNumber: roll, section })
+          body: JSON.stringify({ name, rollNumber, section, photoUrl })
         });
-        if (res.status === 409) {
-          alert('Student already exists in this section.');
-        } else if (!res.ok) {
-          throw new Error('Failed to add student');
-        } else {
-          manageNameInput.value = '';
-          manageRollInput.value = '';
-          await loadManageList(section);
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const msg = data.error || 'Failed to add student.';
+          alert(msg);
+          return;
         }
+
+        studentNameInput.value = '';
+        studentRollInput.value = '';
+        studentPhotoInput.value = '';
+
+        if (!studentSectionInput.value && sectionLabel.textContent) {
+          studentSectionInput.value = sectionLabel.textContent;
+        }
+
+        await loadSectionRoster(section);
       } catch (err) {
         console.error(err);
-        alert('Failed to add student.');
-      } finally {
-        manageAddBtn.disabled = false;
-        manageAddBtn.textContent = 'Add';
+        alert('Failed to add student (network or server error).');
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date();
-      dateInput.value = formatDateForInput(today);
-      snapshotLabel.textContent = 'No session yet';
-
-      teacherInput.addEventListener('input', updateClassHeader);
-      subjectInput.addEventListener('input', updateClassHeader);
-      sectionInput.addEventListener('input', updateClassHeader);
-
-      updateClassHeader();
-      loadRecentSessions();
-
-      loadStudentsBtn.addEventListener('click', loadStudentsForSection);
-      saveSnapshotBtn.addEventListener('click', saveSnapshot);
-
-      if (sessionModalClose) {
-        sessionModalClose.addEventListener('click', closeSessionModal);
-      }
-      if (sessionModalBackdrop) {
-        sessionModalBackdrop.addEventListener('click', (e) => {
-          if (e.target === sessionModalBackdrop) {
-            closeSessionModal();
-          }
-        });
+    async function loadSectionRoster(section) {
+      const sec = section || filterSectionInput.value.trim() || sectionLabel.textContent.trim();
+      if (!sec) {
+        alert('Please provide a section (e.g., AIML-C).');
+        return;
       }
 
-      if (studentModalClose) {
-        studentModalClose.addEventListener('click', closeStudentModal);
-      }
-      if (studentModalBackdrop) {
-        studentModalBackdrop.addEventListener('click', (e) => {
-          if (e.target === studentModalBackdrop) {
-            closeStudentModal();
-          }
-        });
-      }
-
-      if (manageStudentsBtn) {
-        manageStudentsBtn.addEventListener('click', () => {
-          openManagePanel();
-          const section = sectionInput.value.trim();
-          if (section) {
-            manageSectionInput.value = section;
-            loadManageList(section);
-          }
-        });
-      }
-
-      if (manageCloseBtn) {
-        manageCloseBtn.addEventListener('click', closeManagePanel);
-      }
-      if (manageBackdrop) {
-        manageBackdrop.addEventListener('click', (e) => {
-          if (e.target === manageBackdrop) {
-            closeManagePanel();
-          }
-        });
-      }
-
-      if (manageLoadBtn) {
-        manageLoadBtn.addEventListener('click', () => {
-          const section = manageSectionInput.value.trim();
-          if (section) loadManageList(section);
-        });
-      }
-
-      if (manageAddBtn) {
-        manageAddBtn.addEventListener('click', addStudent);
-      }
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeSessionModal();
-          closeManagePanel();
-          closeStudentModal();
+      try {
+        const res = await fetch(`/api/students?section=${encodeURIComponent(sec)}`);
+        if (!res.ok) {
+          alert('Failed to load students for that section.');
+          return;
         }
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-          e.preventDefault();
-          saveSnapshot();
+        const data = await res.json();
+
+        studentsList.innerHTML = '';
+        if (!Array.isArray(data) || data.length === 0) {
+          studentsList.innerHTML = '<div class="sessions-empty">No students found for this section yet.</div>';
+        } else {
+          data.forEach((s) => {
+            const row = document.createElement('div');
+            row.className = 'students-row';
+            const left = document.createElement('div');
+            const right = document.createElement('div');
+
+            left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}`;
+            right.innerHTML = `<span class="meta">${s.section}</span>`;
+            row.appendChild(left);
+            row.appendChild(right);
+            studentsList.appendChild(row);
+          });
         }
+
+        // Also push into roster (clearing old list)
+        clearRoster();
+        data.forEach((s) => {
+          addRosterRow(s.roll_number, s.name, s.section);
+        });
+
+        filterSectionInput.value = sec;
+        sectionLabel.textContent = sec;
+        classSubtitleText.textContent = `${sec} · ${dateLabel.textContent}`;
+      } catch (err) {
+        console.error(err);
+        alert('Failed to load section roster.');
+      }
+    }
+
+    // Sessions
+    async function loadSessions() {
+      try {
+        const res = await fetch('/api/sessions');
+        if (!res.ok) {
+          console.error('Failed to fetch sessions');
+          return;
+        }
+        const data = await res.json();
+        renderSessionsList(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderSessionsList(items) {
+      sessionsList.innerHTML = '';
+      if (!Array.isArray(items) || items.length === 0) {
+        sessionsList.appendChild(sessionsEmpty);
+        sessionsEmpty.style.display = 'block';
+        return;
+      }
+      sessionsEmpty.style.display = 'none';
+
+      items.forEach((session) => {
+        const row = document.createElement('div');
+        row.className = 'session-row';
+        row.dataset.id = session.id;
+
+        const main = document.createElement('div');
+        main.className = 'session-main';
+
+        const left = document.createElement('div');
+        left.innerHTML = `<span class="session-main-title">${session.subject}</span><br/><span class="session-main-meta">${session.teacher_name} · ${session.section}</span>`;
+
+        const right = document.createElement('div');
+        right.innerHTML = `<span class="session-main-meta">${formatNiceDate(session.date)}</span>`;
+
+        main.appendChild(left);
+        main.appendChild(right);
+
+        const extra = document.createElement('div');
+        extra.className = 'session-extra';
+        extra.textContent = `Session #${session.id}`;
+
+        row.appendChild(main);
+        row.appendChild(extra);
+
+        row.addEventListener('click', () => {
+          loadSessionDetails(session.id);
+        });
+
+        sessionsList.appendChild(row);
       });
+    }
+
+    async function loadSessionDetails(id) {
+      try {
+        const res = await fetch(`/api/sessions/${id}`);
+        if (!res.ok) {
+          alert('Failed to fetch session details.');
+          return;
+        }
+        const data = await res.json();
+        renderSessionDetails(data);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to fetch session details.');
+      }
+    }
+
+    function renderSessionDetails(payload) {
+      sessionDetails.innerHTML = '';
+
+      const { session, records } = payload;
+
+      const header = document.createElement('div');
+      header.className = 'students-row';
+      header.innerHTML = `
+        <div>
+          <strong>${session.subject}</strong><br/>
+          <span class="meta">${session.teacher_name} · ${session.section}</span>
+        </div>
+        <div>
+          <span class="meta">${formatNiceDate(session.date)}</span>
+        </div>
+      `;
+      sessionDetails.appendChild(header);
+
+      if (!Array.isArray(records) || records.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'sessions-empty';
+        empty.textContent = 'No attendance records stored for this session.';
+        sessionDetails.appendChild(empty);
+        return;
+      }
+
+      records.forEach((r) => {
+        const row = document.createElement('div');
+        row.className = 'students-row';
+        row.innerHTML = `
+          <div>
+            <strong>${r.roll_number}</strong> · ${r.name}
+          </div>
+          <div>
+            <span class="meta">${r.status}</span>
+          </div>
+        `;
+        sessionDetails.appendChild(row);
+      });
+    }
+
+    // Save session (POST /api/attendance)
+    async function saveSession() {
+      const teacherName = teacherNameLabel.textContent.trim() || 'Teacher';
+      const subject = subjectLabel.textContent.trim() || 'Subject';
+      const section = sectionLabel.textContent.trim() || 'AIML-C';
+      const dateIso = todayISO();
+
+      const students = buildStudentsPayload();
+      if (!students.length) {
+        const sure = confirm('No students in roster. Save empty session?');
+        if (!sure) return;
+      }
+
+      const body = {
+        teacherName,
+        subject,
+        section,
+        date: dateIso,
+        students
+      };
+
+      try {
+        const res = await fetch('/api/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const msg = data.error || 'Failed to save attendance.';
+          alert(msg);
+          return;
+        }
+
+        const data = await res.json();
+        alert(`Saved session #${data.sessionId || ''}`.trim());
+        await loadSessions();
+      } catch (err) {
+        console.error(err);
+        alert('Failed to save attendance (network or server error).');
+      }
+    }
+
+    // Wire events
+    function wireEvents() {
+      saveSessionBtn.addEventListener('click', saveSession);
+      addStudentBtn.addEventListener('click', addStudent);
+      loadSectionBtn.addEventListener('click', () => loadSectionRoster());
+    }
+
+    // Demo starter rows (optional, can be removed)
+    function seedDemoRoster() {
+      if (rosterBody.children.length > 0) return;
+      addRosterRow('20', 'Detroit', 'AIML-C', 'present');
+      addRosterRow('21', 'Sana', 'AIML-C', 'absent');
+      addRosterRow('22', 'Rahul', 'AIML-C', 'late');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initHeaderDefaults();
+      wireEvents();
+      seedDemoRoster();
+      loadSessions();
     });
   </script>
 </body>
