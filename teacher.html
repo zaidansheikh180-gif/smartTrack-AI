@@ -205,13 +205,6 @@
       margin-bottom: 8px;
     }
 
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
     .card-subtitle {
       font-size: 11px;
       color: var(--muted);
@@ -229,12 +222,6 @@
       background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb;
       white-space: nowrap;
-    }
-
-    .chip-green {
-      border-color: rgba(34, 197, 94, 0.7);
-      background: rgba(22, 163, 74, 0.16);
-      color: #bbf7d0;
     }
 
     .chip-soft {
@@ -350,7 +337,8 @@
       background: rgba(15, 23, 42, 0.98);
     }
 
-    th, td {
+    th,
+    td {
       padding: 7px 10px;
       text-align: left;
       border-bottom: 1px solid rgba(31, 41, 55, 0.9);
@@ -584,6 +572,12 @@
       text-decoration: underline;
       text-underline-offset: 3px;
     }
+
+    .profile-hint {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -615,13 +609,12 @@
     </header>
 
     <main class="teacher-layout">
-      <!-- LEFT COLUMN: current class + roster -->
+      <!-- LEFT COLUMN: subject + roster -->
       <section class="column">
-        <!-- Current class card -->
+        <!-- Class details card (no 'Current class' text) -->
         <section class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Current class</div>
               <div class="card-subtitle">
                 Fill in the details and mark each student. Then use “Quick save snapshot”.
               </div>
@@ -634,33 +627,73 @@
 
           <div class="class-top-row">
             <div class="class-title-block">
-              <div class="class-main-label" id="class-title-text">Python Lab</div>
+              <div class="class-main-label" id="class-title-text">Class</div>
               <div class="class-main-sub" id="class-subtitle-text">
                 Section AIML-C · Today
               </div>
             </div>
-            <button class="btn-snapshot" id="save-session-btn">
-              Quick save snapshot
-              <span>▢</span>
-            </button>
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+              <button class="btn-snapshot" id="save-session-btn">
+                Quick save snapshot
+                <span>▢</span>
+              </button>
+              <button class="btn-small" id="save-teacher-profile-btn" style="margin-top:4px;">
+                Save teacher profile
+                <span>💾</span>
+              </button>
+              <div class="profile-hint">
+                Saves your name, subject, section & default date.
+              </div>
+            </div>
           </div>
 
           <div class="class-meta">
             <div class="class-meta-item">
               <span>👩‍🏫</span>
-              <span><strong>Teacher:</strong> <span id="teacher-name-label">Your name</span></span>
+              <span>
+                <strong>Teacher:</strong>
+                <input
+                  id="teacher-input"
+                  type="text"
+                  placeholder="Your name"
+                  style="background: transparent; border: none; color: #e5e7eb; font-size: 11px; outline: none; width: 120px;"
+                />
+              </span>
             </div>
             <div class="class-meta-item">
               <span>📘</span>
-              <span><strong>Subject:</strong> <span id="subject-label">Subject</span></span>
+              <span>
+                <strong>Subject:</strong>
+                <input
+                  id="subject-input"
+                  type="text"
+                  placeholder="Subject"
+                  style="background: transparent; border: none; color: #e5e7eb; font-size: 11px; outline: none; width: 120px;"
+                />
+              </span>
             </div>
             <div class="class-meta-item">
               <span>🏷️</span>
-              <span><strong>Section:</strong> <span id="section-label">AIML-C</span></span>
+              <span>
+                <strong>Section:</strong>
+                <input
+                  id="section-input"
+                  type="text"
+                  placeholder="AIML-C"
+                  style="background: transparent; border: none; color: #e5e7eb; font-size: 11px; outline: none; width: 90px;"
+                />
+              </span>
             </div>
             <div class="class-meta-item">
               <span>📅</span>
-              <span><strong>Date:</strong> <span id="date-label">Today</span></span>
+              <span>
+                <strong>Date:</strong>
+                <input
+                  id="date-input"
+                  type="date"
+                  style="background: transparent; border: none; color: #e5e7eb; font-size: 11px; outline: none;"
+                />
+              </span>
             </div>
           </div>
         </section>
@@ -669,7 +702,6 @@
         <section class="card-soft">
           <div class="card-header">
             <div>
-              <div class="card-title">Live roster</div>
               <div class="card-subtitle">
                 Adjust status per row before saving. New students will auto‑create in the database.
               </div>
@@ -709,9 +741,8 @@
         <section class="card-soft">
           <div class="card-header">
             <div>
-              <div class="card-title">Manage students</div>
               <div class="card-subtitle">
-                Add students or load a full section roster. Face photo URL is optional and for later AI.
+                Add students or load a full section roster. Photo will be set later by the student.
               </div>
             </div>
             <div class="chip-soft">
@@ -734,10 +765,6 @@
             <div class="field">
               <label for="student-section-input">Section</label>
               <input id="student-section-input" type="text" placeholder="e.g., AIML-C" />
-            </div>
-            <div class="field">
-              <label for="student-photo-input">Photo URL (optional)</label>
-              <input id="student-photo-input" type="text" placeholder="https://..." />
             </div>
           </div>
           <button class="btn-small" id="add-student-btn">
@@ -770,7 +797,6 @@
         <section class="card-soft">
           <div class="card-header">
             <div>
-              <div class="card-title">Recent sessions</div>
               <div class="card-subtitle">
                 Click a session to inspect who was present, absent, or late.
               </div>
@@ -809,31 +835,32 @@
   </div>
 
   <script>
-    // Basic front-end wiring to match the API contracts you already have.
+    const classTitleText = document.getElementById("class-title-text");
+    const classSubtitleText = document.getElementById("class-subtitle-text");
 
-    const teacherNameLabel = document.getElementById('teacher-name-label');
-    const subjectLabel = document.getElementById('subject-label');
-    const sectionLabel = document.getElementById('section-label');
-    const dateLabel = document.getElementById('date-label');
-    const classTitleText = document.getElementById('class-title-text');
-    const classSubtitleText = document.getElementById('class-subtitle-text');
-    const rosterBody = document.getElementById('roster-body');
-    const rosterCount = document.getElementById('roster-count');
-    const saveSessionBtn = document.getElementById('save-session-btn');
+    const teacherInput = document.getElementById("teacher-input");
+    const subjectInput = document.getElementById("subject-input");
+    const sectionInput = document.getElementById("section-input");
+    const dateInput = document.getElementById("date-input");
 
-    const addStudentBtn = document.getElementById('add-student-btn');
-    const loadSectionBtn = document.getElementById('load-section-btn');
+    const saveTeacherProfileBtn = document.getElementById("save-teacher-profile-btn");
 
-    const studentNameInput = document.getElementById('student-name-input');
-    const studentRollInput = document.getElementById('student-roll-input');
-    const studentSectionInput = document.getElementById('student-section-input');
-    const studentPhotoInput = document.getElementById('student-photo-input');
-    const filterSectionInput = document.getElementById('filter-section-input');
-    const studentsList = document.getElementById('students-list');
+    const rosterBody = document.getElementById("roster-body");
+    const rosterCount = document.getElementById("roster-count");
+    const saveSessionBtn = document.getElementById("save-session-btn");
 
-    const sessionsList = document.getElementById('sessions-list');
-    const sessionsEmpty = document.getElementById('sessions-empty');
-    const sessionDetails = document.getElementById('session-details');
+    const addStudentBtn = document.getElementById("add-student-btn");
+    const loadSectionBtn = document.getElementById("load-section-btn");
+
+    const studentNameInput = document.getElementById("student-name-input");
+    const studentRollInput = document.getElementById("student-roll-input");
+    const studentSectionInput = document.getElementById("student-section-input");
+    const filterSectionInput = document.getElementById("filter-section-input");
+    const studentsList = document.getElementById("students-list");
+
+    const sessionsList = document.getElementById("sessions-list");
+    const sessionsEmpty = document.getElementById("sessions-empty");
+    const sessionDetails = document.getElementById("session-details");
 
     function todayISO() {
       const d = new Date();
@@ -841,40 +868,101 @@
     }
 
     function formatNiceDate(iso) {
-      if (!iso) return 'Today';
+      if (!iso) return "Today";
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return iso;
       return d.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     }
 
     function initHeaderDefaults() {
       const today = todayISO();
-      dateLabel.textContent = formatNiceDate(today);
-      classSubtitleText.textContent = `${sectionLabel.textContent} · ${formatNiceDate(today)}`;
+      dateInput.value = today;
+      sectionInput.value = "AIML-C";
+      subjectInput.value = "";
+      teacherInput.value = "";
+      updateHeaderFromInputs();
     }
 
-    // Roster helpers
-    function addRosterRow(roll, name, section, status = 'present', notes = '') {
-      const tr = document.createElement('tr');
+    function updateHeaderFromInputs() {
+      const subject = subjectInput.value.trim() || "Class";
+      const section = sectionInput.value.trim() || "AIML-C";
+      const d = dateInput.value || todayISO();
+      classTitleText.textContent = subject;
+      classSubtitleText.textContent = `Section ${section} · ${formatNiceDate(d)}`;
+    }
 
-      const tdRoll = document.createElement('td');
+    async function loadTeacherProfile() {
+      try {
+        const res = await fetch("/api/teachers/me");
+        if (!res.ok) {
+          initHeaderDefaults();
+          return;
+        }
+        const data = await res.json();
+
+        if (data.name) teacherInput.value = data.name;
+        if (data.subject) subjectInput.value = data.subject;
+        if (data.section) sectionInput.value = data.section;
+        if (data.default_date) {
+          dateInput.value = data.default_date;
+        } else if (!dateInput.value) {
+          dateInput.value = todayISO();
+        }
+        updateHeaderFromInputs();
+      } catch (err) {
+        console.error("Failed to load teacher profile", err);
+        initHeaderDefaults();
+      }
+    }
+
+    async function saveTeacherProfile() {
+      const body = {
+        name: teacherInput.value.trim() || "Teacher",
+        subject: subjectInput.value.trim() || "Class",
+        section: sectionInput.value.trim() || "AIML-C",
+        default_date: dateInput.value || todayISO(),
+      };
+
+      try {
+        const res = await fetch("/api/teachers/me", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const msg = data.error || "Failed to save teacher profile.";
+          alert(msg);
+          return;
+        }
+        alert("Teacher profile saved.");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to save teacher profile (network or server error).");
+      }
+    }
+
+    function addRosterRow(roll, name, section, status = "present", notes = "") {
+      const tr = document.createElement("tr");
+
+      const tdRoll = document.createElement("td");
       tdRoll.textContent = roll;
 
-      const tdName = document.createElement('td');
+      const tdName = document.createElement("td");
       tdName.textContent = name;
 
-      const tdSection = document.createElement('td');
+      const tdSection = document.createElement("td");
       tdSection.textContent = section;
 
-      const tdStatus = document.createElement('td');
-      const select = document.createElement('select');
-      select.className = 'status-select';
-      ['present', 'absent', 'late'].forEach((opt) => {
-        const option = document.createElement('option');
+      const tdStatus = document.createElement("td");
+      const select = document.createElement("select");
+      select.className = "status-select";
+      ["present", "absent", "late"].forEach((opt) => {
+        const option = document.createElement("option");
         option.value = opt;
         option.textContent = opt[0].toUpperCase() + opt.slice(1);
         if (opt === status) option.selected = true;
@@ -882,8 +970,8 @@
       });
       tdStatus.appendChild(select);
 
-      const tdNotes = document.createElement('td');
-      tdNotes.textContent = notes || '';
+      const tdNotes = document.createElement("td");
+      tdNotes.textContent = notes || "";
 
       tr.appendChild(tdRoll);
       tr.appendChild(tdName);
@@ -896,116 +984,123 @@
     }
 
     function clearRoster() {
-      rosterBody.innerHTML = '';
+      rosterBody.innerHTML = "";
       updateRosterCount();
     }
 
     function updateRosterCount() {
-      const rows = rosterBody.querySelectorAll('tr');
+      const rows = rosterBody.querySelectorAll("tr");
       rosterCount.textContent = rows.length;
     }
 
     function buildStudentsPayload() {
-      const rows = rosterBody.querySelectorAll('tr');
+      const rows = rosterBody.querySelectorAll("tr");
       const students = [];
       rows.forEach((row) => {
-        const cells = row.querySelectorAll('td');
+        const cells = row.querySelectorAll("td");
         const roll = cells[0].textContent.trim();
         const name = cells[1].textContent.trim();
         const section = cells[2].textContent.trim();
-        const statusSelect = cells[3].querySelector('select');
-        const status = statusSelect ? statusSelect.value : 'present';
+        const statusSelect = cells[3].querySelector("select");
+        const status = statusSelect ? statusSelect.value : "present";
         if (!roll || !name || !section) return;
         students.push({
           rollNumber: roll,
           name,
           section,
-          status
+          status,
         });
       });
       return students;
     }
 
-    // Manage students panel
     async function addStudent() {
       const name = studentNameInput.value.trim();
       const rollNumber = studentRollInput.value.trim();
-      const section = studentSectionInput.value.trim();
-      const photoUrl = studentPhotoInput.value.trim();
+      const section =
+        studentSectionInput.value.trim() || sectionInput.value.trim();
 
       if (!name || !rollNumber || !section) {
-        alert('Please fill name, roll, and section.');
+        alert("Please fill name, roll, and section.");
         return;
       }
 
       try {
-        const res = await fetch('/api/students', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, rollNumber, section, photoUrl })
+        const res = await fetch("/api/students", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, rollNumber, section }),
         });
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          const msg = data.error || 'Failed to add student.';
+          const msg = data.error || "Failed to add student.";
           alert(msg);
           return;
         }
 
-        studentNameInput.value = '';
-        studentRollInput.value = '';
-        studentPhotoInput.value = '';
+        studentNameInput.value = "";
+        studentRollInput.value = "";
 
-        if (!studentSectionInput.value && sectionLabel.textContent) {
-          studentSectionInput.value = sectionLabel.textContent;
+        if (!studentSectionInput.value && sectionInput.value) {
+          studentSectionInput.value = sectionInput.value;
         }
 
         await loadSectionRoster(section);
       } catch (err) {
         console.error(err);
-        alert('Failed to add student (network or server error).');
+        alert("Failed to add student (network or server error).");
       }
     }
 
     async function loadSectionRoster(section) {
-      const sec = section || filterSectionInput.value.trim() || sectionLabel.textContent.trim();
+      const sec =
+        section ||
+        filterSectionInput.value.trim() ||
+        sectionInput.value.trim();
       if (!sec) {
-        alert('Please provide a section (e.g., AIML-C).');
+        alert("Please provide a section (e.g., AIML-C).");
         return;
       }
 
       try {
-        const res = await fetch(`/api/students?section=${encodeURIComponent(sec)}`);
+        const res = await fetch(
+          `/api/students?section=${encodeURIComponent(sec)}`
+        );
         if (!res.ok) {
-          alert('Failed to load students for that section.');
+          alert("Failed to load students for that section.");
           return;
         }
         const data = await res.json();
 
-        studentsList.innerHTML = '';
+        studentsList.innerHTML = "";
         if (!Array.isArray(data) || data.length === 0) {
-          studentsList.innerHTML = '<div class="sessions-empty">No students found for this section yet.</div>';
+          studentsList.innerHTML =
+            '<div class="sessions-empty">No students found for this section yet.</div>';
         } else {
           data.forEach((s) => {
-            const row = document.createElement('div');
-            row.className = 'students-row';
+            const row = document.createElement("div");
+            row.className = "students-row";
 
-            const left = document.createElement('div');
+            const left = document.createElement("div");
             left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}<br/><span class="meta">${s.section}</span>`;
 
-            const right = document.createElement('div');
-            right.style.display = 'flex';
-            right.style.alignItems = 'center';
-            right.style.gap = '6px';
+            const right = document.createElement("div");
+            right.style.display = "flex";
+            right.style.alignItems = "center";
+            right.style.gap = "6px";
 
-            const viewBtn = document.createElement('button');
-            viewBtn.textContent = 'View profile';
-            viewBtn.className = 'btn-small';
-            viewBtn.style.padding = '4px 8px';
-            viewBtn.style.fontSize = '10px';
+            const viewBtn = document.createElement("button");
+            viewBtn.textContent = "View profile";
+            viewBtn.className = "btn-small";
+            viewBtn.style.padding = "4px 8px";
+            viewBtn.style.fontSize = "10px";
 
-            viewBtn.addEventListener('click', () => {
-              window.open(`/student?roll=${encodeURIComponent(s.roll_number)}`, '_blank');
+            viewBtn.addEventListener("click", () => {
+              window.open(
+                `/student?roll=${encodeURIComponent(s.roll_number)}`,
+                "_blank"
+              );
             });
 
             right.appendChild(viewBtn);
@@ -1016,27 +1111,25 @@
           });
         }
 
-        // Also push into roster (clearing old list)
         clearRoster();
         data.forEach((s) => {
           addRosterRow(s.roll_number, s.name, s.section);
         });
 
         filterSectionInput.value = sec;
-        sectionLabel.textContent = sec;
-        classSubtitleText.textContent = `${sec} · ${dateLabel.textContent}`;
+        sectionInput.value = sec;
+        updateHeaderFromInputs();
       } catch (err) {
         console.error(err);
-        alert('Failed to load section roster.');
+        alert("Failed to load section roster.");
       }
     }
 
-    // Sessions
     async function loadSessions() {
       try {
-        const res = await fetch('/api/sessions');
+        const res = await fetch("/api/sessions");
         if (!res.ok) {
-          console.error('Failed to fetch sessions');
+          console.error("Failed to fetch sessions");
           return;
         }
         const data = await res.json();
@@ -1047,39 +1140,41 @@
     }
 
     function renderSessionsList(items) {
-      sessionsList.innerHTML = '';
+      sessionsList.innerHTML = "";
       if (!Array.isArray(items) || items.length === 0) {
         sessionsList.appendChild(sessionsEmpty);
-        sessionsEmpty.style.display = 'block';
+        sessionsEmpty.style.display = "block";
         return;
       }
-      sessionsEmpty.style.display = 'none';
+      sessionsEmpty.style.display = "none";
 
       items.forEach((session) => {
-        const row = document.createElement('div');
-        row.className = 'session-row';
+        const row = document.createElement("div");
+        row.className = "session-row";
         row.dataset.id = session.id;
 
-        const main = document.createElement('div');
-        main.className = 'session-main';
+        const main = document.createElement("div");
+        main.className = "session-main";
 
-        const left = document.createElement('div');
+        const left = document.createElement("div");
         left.innerHTML = `<span class="session-main-title">${session.subject}</span><br/><span class="session-main-meta">${session.teacher_name} · ${session.section}</span>`;
 
-        const right = document.createElement('div');
-        right.innerHTML = `<span class="session-main-meta">${formatNiceDate(session.date)}</span>`;
+        const right = document.createElement("div");
+        right.innerHTML = `<span class="session-main-meta">${formatNiceDate(
+          session.date
+        )}</span>`;
 
         main.appendChild(left);
         main.appendChild(right);
 
-        const extra = document.createElement('div');
-        extra.className = 'session-extra';
+        const extra = document.createElement("div");
+        extra.className = "session-extra";
         extra.textContent = `Session #${session.id}`;
 
         row.appendChild(main);
         row.appendChild(extra);
 
-        row.addEventListener('click', () => {
+        row.addEventListener("click", () => {
           loadSessionDetails(session.id);
         });
 
@@ -1091,24 +1186,24 @@
       try {
         const res = await fetch(`/api/sessions/${id}`);
         if (!res.ok) {
-          alert('Failed to fetch session details.');
+          alert("Failed to fetch session details.");
           return;
         }
         const data = await res.json();
         renderSessionDetails(data);
       } catch (err) {
         console.error(err);
-        alert('Failed to fetch session details.');
+        alert("Failed to fetch session details.");
       }
     }
 
     function renderSessionDetails(payload) {
-      sessionDetails.innerHTML = '';
+      sessionDetails.innerHTML = "";
 
       const { session, records } = payload;
 
-      const header = document.createElement('div');
-      header.className = 'students-row';
+      const header = document.createElement("div");
+      header.className = "students-row";
       header.innerHTML = `
         <div>
           <strong>${session.subject}</strong><br/>
@@ -1121,16 +1216,16 @@
       sessionDetails.appendChild(header);
 
       if (!Array.isArray(records) || records.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'sessions-empty';
-        empty.textContent = 'No attendance records stored for this session.';
+        const empty = document.createElement("div");
+        empty.className = "sessions-empty";
+        empty.textContent = "No attendance records stored for this session.";
         sessionDetails.appendChild(empty);
         return;
       }
 
       records.forEach((r) => {
-        const row = document.createElement('div');
-        row.className = 'students-row';
+        const row = document.createElement("div");
+        row.className = "students-row";
         row.innerHTML = `
           <div>
             <strong>${r.roll_number}</strong> · ${r.name}
@@ -1143,16 +1238,15 @@
       });
     }
 
-    // Save session (POST /api/attendance)
     async function saveSession() {
-      const teacherName = teacherNameLabel.textContent.trim() || 'Teacher';
-      const subject = subjectLabel.textContent.trim() || 'Subject';
-      const section = sectionLabel.textContent.trim() || 'AIML-C';
-      const dateIso = todayISO();
+      const teacherName = teacherInput.value.trim() || "Teacher";
+      const subject = subjectInput.value.trim() || "Class";
+      const section = sectionInput.value.trim() || "AIML-C";
+      const dateIso = dateInput.value || todayISO();
 
       const students = buildStudentsPayload();
       if (!students.length) {
-        const sure = confirm('No students in roster. Save empty session?');
+        const sure = confirm("No students in roster. Save empty session?");
         if (!sure) return;
       }
 
@@ -1161,49 +1255,54 @@
         subject,
         section,
         date: dateIso,
-        students
+        students,
       };
 
       try {
-        const res = await fetch('/api/attendance', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+        const res = await fetch("/api/attendance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         });
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          const msg = data.error || 'Failed to save attendance.';
+          const msg = data.error || "Failed to save attendance.";
           alert(msg);
           return;
         }
 
         const data = await res.json();
-        alert(`Saved session #${data.sessionId || ''}`.trim());
+        alert(`Saved session #${data.sessionId || ""}`.trim());
         await loadSessions();
       } catch (err) {
         console.error(err);
-        alert('Failed to save attendance (network or server error).');
+        alert("Failed to save attendance (network or server error).");
       }
     }
 
-    // Wire events
     function wireEvents() {
-      saveSessionBtn.addEventListener('click', saveSession);
-      addStudentBtn.addEventListener('click', addStudent);
-      loadSectionBtn.addEventListener('click', () => loadSectionRoster());
+      saveSessionBtn.addEventListener("click", saveSession);
+      addStudentBtn.addEventListener("click", addStudent);
+      loadSectionBtn.addEventListener("click", () => loadSectionRoster());
+
+      teacherInput.addEventListener("input", updateHeaderFromInputs);
+      subjectInput.addEventListener("input", updateHeaderFromInputs);
+      sectionInput.addEventListener("input", updateHeaderFromInputs);
+      dateInput.addEventListener("input", updateHeaderFromInputs);
+
+      saveTeacherProfileBtn.addEventListener("click", saveTeacherProfile);
     }
 
-    // Demo starter rows (optional, can be removed)
     function seedDemoRoster() {
       if (rosterBody.children.length > 0) return;
-      addRosterRow('20', 'Detroit', 'AIML-C', 'present');
-      addRosterRow('21', 'Sana', 'AIML-C', 'absent');
-      addRosterRow('22', 'Rahul', 'AIML-C', 'late');
+      addRosterRow("20", "Detroit", "AIML-C", "present");
+      addRosterRow("21", "Sana", "AIML-C", "absent");
+      addRosterRow("22", "Rahul", "AIML-C", "late");
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      initHeaderDefaults();
+    document.addEventListener("DOMContentLoaded", () => {
+      loadTeacherProfile();
       wireEvents();
       seedDemoRoster();
       loadSessions();

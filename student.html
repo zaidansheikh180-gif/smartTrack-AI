@@ -263,6 +263,51 @@
         color: #fdba74;
       }
 
+      /* Profile photo upload card */
+      .profile-card {
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .profile-card img {
+        width: 72px;
+        height: 72px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid #1f2937;
+        background: #020617;
+      }
+
+      .profile-card-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+      }
+
+      .profile-card-controls input[type="file"] {
+        font-size: 0.8rem;
+      }
+
+      .btn-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #374151;
+        background: #020617;
+        color: #e5e7eb;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+
+      .btn-small:hover {
+        background: #111827;
+      }
+
       @media (max-width: 900px) {
         body {
           flex-direction: column;
@@ -318,6 +363,39 @@
           </div>
         </div>
       </header>
+
+      <!-- Profile photo upload (option 1) -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Profile photo</div>
+            <div class="card-subtitle">
+              This single photo is used for your profile and face login demo.
+            </div>
+          </div>
+        </div>
+        <div class="profile-card">
+          <img
+            id="photo-preview"
+            src="/images/default-avatar.png"
+            alt="Profile photo"
+          />
+          <div class="profile-card-controls">
+            <span>Choose a clear front-facing photo.</span>
+            <input
+              id="photo-input"
+              type="file"
+              accept="image/*"
+            />
+            <button class="btn-small" id="save-photo-btn">
+              Save photo
+            </button>
+            <span id="photo-hint" style="color:#9ca3af;">
+              If you update this, the system will use the new image for login.
+            </span>
+          </div>
+        </div>
+      </section>
 
       <section class="grid">
         <div class="card">
@@ -423,6 +501,7 @@
 
     <script>
       let currentPhotoUrl = null;
+      let currentPhotoBase64 = null;
 
       function getRollFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -470,6 +549,11 @@
             avatarImg.src = currentPhotoUrl;
             avatarImg.style.display = "block";
             avatarInitial.style.display = "none";
+
+            const profilePreview = document.getElementById("photo-preview");
+            if (profilePreview) {
+              profilePreview.src = currentPhotoUrl;
+            }
           } else {
             avatarImg.style.display = "none";
             avatarInitial.style.display = "block";
@@ -561,7 +645,7 @@
         }
       }
 
-      // Click avatar to view full photo
+      // Avatar click: open full photo
       document.getElementById("avatar").addEventListener("click", () => {
         if (currentPhotoUrl) {
           window.open(currentPhotoUrl, "_blank");
@@ -569,6 +653,68 @@
           alert("No photo available for this student yet.");
         }
       });
+
+      // Photo upload logic (option 1)
+      const photoInput = document.getElementById("photo-input");
+      const photoPreview = document.getElementById("photo-preview");
+      const savePhotoBtn = document.getElementById("save-photo-btn");
+
+      if (photoInput && photoPreview && savePhotoBtn) {
+        photoInput.addEventListener("change", () => {
+          const file = photoInput.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            currentPhotoBase64 = e.target.result; // data:image/...;base64,...
+            photoPreview.src = currentPhotoBase64;
+
+            // Also update top-right avatar preview immediately
+            const avatarImg = document.getElementById("avatar-img");
+            const avatarInitial = document.getElementById("avatar-initial");
+            if (avatarImg && avatarInitial) {
+              avatarImg.src = currentPhotoBase64;
+              avatarImg.style.display = "block";
+              avatarInitial.style.display = "none";
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+
+        savePhotoBtn.addEventListener("click", async () => {
+          const roll = getRollFromUrl();
+          if (!roll) {
+            alert("Missing student roll in URL.");
+            return;
+          }
+          if (!currentPhotoBase64) {
+            alert("Please choose a photo first.");
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `/api/students/${encodeURIComponent(roll)}/photo`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ photoUrl: currentPhotoBase64 }),
+              }
+            );
+
+            if (!res.ok) {
+              const data = await res.json().catch(() => ({}));
+              alert(data.error || "Failed to save photo.");
+              return;
+            }
+
+            currentPhotoUrl = currentPhotoBase64;
+            alert("Profile photo saved.");
+          } catch (err) {
+            console.error(err);
+            alert("Failed to save photo (network or server error).");
+          }
+        });
+      }
 
       loadStudentDashboard();
     </script>

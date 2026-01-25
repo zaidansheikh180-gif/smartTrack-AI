@@ -257,8 +257,8 @@ app.post("/api/attendance", requireAuth, requireRole("teacher"), (req, res) => {
 
     const insertStudent = db.prepare(
       `
-      INSERT INTO students (name, roll_number, section)
-      VALUES (?, ?, ?)
+      INSERT INTO students (name, roll_number, section, email, photo_url)
+      VALUES (?, ?, ?, NULL, NULL)
     `
     );
 
@@ -500,6 +500,55 @@ app.post(
     }
   }
 );
+
+// NEW: update a student's profile photo (teacher or student can call this)
+app.put("/api/students/:roll/photo", requireAuth, async (req, res) => {
+  try {
+    const roll = req.params.roll;
+    const { photoUrl } = req.body;
+
+    if (!roll) {
+      return res.status(400).json({ error: "Missing roll parameter" });
+    }
+
+    if (!photoUrl) {
+      return res.status(400).json({ error: "photoUrl is required" });
+    }
+
+    const student = db
+      .prepare(
+        `
+        SELECT id, roll_number
+        FROM students
+        WHERE roll_number = ?
+        LIMIT 1
+      `
+      )
+      .get(roll);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // If logged in as student, enforce own roll only
+    if (req.user.role === "student" && req.user.roll_number !== roll) {
+      return res.status(403).json({ error: "Forbidden for this student" });
+    }
+
+    db.prepare(
+      `
+      UPDATE students
+      SET photo_url = ?
+      WHERE roll_number = ?
+    `
+    ).run(photoUrl, roll);
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to update student photo" });
+  }
+});
 
 // Per-student history by roll number (student or teacher)
 app.get("/api/students/:roll/history", requireAuth, (req, res) => {
