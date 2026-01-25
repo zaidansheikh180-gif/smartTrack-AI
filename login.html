@@ -373,7 +373,7 @@
       justify-content: center;
       gap: 8px;
       box-shadow: 0 16px 34px rgba(79, 70, 229, 0.7);
-      transition: all 0.15s ease;
+      transition: all 0.15s.ease;
     }
 
     .btn-primary:hover {
@@ -471,7 +471,7 @@
         </h1>
         <p class="info-main-sub">
           Teachers manage live classes and snapshots. Students see a clean
-          history, face‑ready profile, and section‑wise stats.
+          history and section‑wise stats.
         </p>
 
         <div class="info-list">
@@ -485,7 +485,7 @@
           <div class="info-list-item">
             <span>•</span>
             <span
-              >Student login opens their own photo, roll, section, and
+              >Student login opens their own roll, section, and
               attendance trend.</span
             >
           </div>
@@ -517,7 +517,7 @@
         <div>
           <div class="auth-badge">
             <span>🔒</span>
-            Demo only – no real auth yet
+            Demo auth – email & password
           </div>
         </div>
       </header>
@@ -585,30 +585,12 @@
             <span>↗</span>
           </button>
 
-          <button class="btn-ghost" type="button" id="face-login-btn">
-            Use Face ID (camera)
-            <span>📷</span>
-          </button>
-
           <button class="btn-ghost" type="button" onclick="goDemoTeacher()">
             Skip sign‑in · Open teacher demo
             <span>▢</span>
           </button>
         </div>
 
-        <video
-          id="camera"
-          autoplay
-          playsinline
-          style="
-            display: none;
-            width: 100%;
-            margin-top: 8px;
-            border-radius: 16px;
-            border: 1px solid rgba(31, 41, 55, 0.9);
-          "
-        ></video>
-        <canvas id="snapshot" style="display: none;"></canvas>
         <div
           id="status"
           style="font-size: 11px; margin-top: 6px; color: #9ca3af;"
@@ -616,8 +598,9 @@
 
         <div class="auth-footnote">
           <span
-            >Later this will connect to real signup, passwords, and face
-            identity checks.</span
+            >Use the demo accounts:
+            <br />Teacher – teacher@college.edu / password123
+            <br />Student – student20@college.edu / password123</span
           >
           <a href="/">Back to landing</a>
         </div>
@@ -629,9 +612,6 @@
     const tabs = document.querySelectorAll(".auth-tab");
     const studentExtra = document.getElementById("student-extra");
     const form = document.getElementById("auth-form");
-    const camera = document.getElementById("camera");
-    const canvas = document.getElementById("snapshot");
-    const faceBtn = document.getElementById("face-login-btn");
     const statusEl = document.getElementById("status");
 
     let currentRole = "teacher";
@@ -653,88 +633,66 @@
       window.location.href = "/teacher";
     }
 
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (currentRole === "teacher") {
-        window.location.href = "/teacher";
-      } else {
-        const rollInput = document.getElementById("roll");
-        const roll = rollInput.value.trim();
-        if (!roll) {
-          alert("Enter your roll number to open your student dashboard.");
+      statusEl.textContent = "Signing in...";
+      statusEl.style.color = "#9ca3af";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ email, password }).toString(),
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          statusEl.textContent = data.message || "Login failed.";
+          statusEl.style.color = "#f97373";
           return;
         }
-        window.location.href = "/student?roll=" + encodeURIComponent(roll);
+
+        statusEl.textContent = "Login successful. Redirecting...";
+        statusEl.style.color = "#4ade80";
+
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        } else if (data.role === "teacher") {
+          window.location.href = "/teacher";
+        } else if (data.role === "student" && data.roll) {
+          window.location.href =
+            "/student?roll=" + encodeURIComponent(data.roll);
+        } else {
+          window.location.href = "/";
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error contacting server.";
+        statusEl.style.color = "#f97373";
       }
     });
 
-    async function startCamera() {
+    // Auto-redirect if already logged in (JWT cookie present)
+    window.addEventListener("DOMContentLoaded", async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        camera.srcObject = stream;
-        camera.style.display = "block";
-        return stream;
-      } catch (err) {
-        statusEl.textContent = "Camera access blocked or failed.";
-        statusEl.style.color = "#f97373";
-        throw err;
-      }
-    }
+        const res = await fetch("/auth/me", { method: "GET" });
+        if (!res.ok) return;
 
-    function takePhoto() {
-      const ctx = canvas.getContext("2d");
-      canvas.width = camera.videoWidth;
-      canvas.height = camera.videoHeight;
-      ctx.drawImage(camera, 0, 0);
-      return canvas.toDataURL("image/jpeg");
-    }
+        const data = await res.json();
+        if (!data.ok) return;
 
-    faceBtn.addEventListener("click", async () => {
-      statusEl.textContent = "";
-      statusEl.style.color = "#9ca3af";
-
-      let stream;
-      try {
-        stream = await startCamera();
-        statusEl.textContent = "Capturing your face...";
-        statusEl.style.color = "#4ade80";
-
-        setTimeout(async () => {
-          const photo = takePhoto();
-
-          const res = await fetch("/face-login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: photo, role: currentRole }),
-          });
-
-          const data = await res.json();
-
-          if (stream) {
-            stream.getTracks().forEach((t) => t.stop());
-          }
-          camera.style.display = "none";
-
-          if (data.success) {
-            statusEl.textContent = "Face recognized. Redirecting...";
-            statusEl.style.color = "#4ade80";
-            if (data.role === "student") {
-              window.location.href =
-                "/student?roll=" + encodeURIComponent(data.roll);
-            } else {
-              window.location.href =
-                "/teacher?code=" +
-                encodeURIComponent(data.code || data.roll || "T001");
-            }
-          } else {
-            statusEl.textContent = data.message || "Face not recognized.";
-            statusEl.style.color = "#f97373";
-          }
-        }, 1500);
+        if (data.role === "teacher") {
+          window.location.href = "/teacher";
+        } else if (data.role === "student" && data.roll) {
+          window.location.href =
+            "/student?roll=" + encodeURIComponent(data.roll);
+        }
       } catch (e) {
-        // error already shown
+        console.error(e);
       }
     });
   </script>

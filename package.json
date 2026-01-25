@@ -19,7 +19,10 @@
   },
   "homepage": "https://github.com/zaidansheikh180-gif/smartTrack-AI#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.6.2",
-    "express": "^5.2.1"
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
   }
 }

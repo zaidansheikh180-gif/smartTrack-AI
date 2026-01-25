@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Student Dashboard</title>
+    <title>Student Dashboard · SmartTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       * {
@@ -89,8 +89,8 @@
       }
 
       .avatar {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 999px;
         background: linear-gradient(135deg, #1d4ed8, #06b6d4);
         display: flex;
@@ -98,6 +98,25 @@
         justify-content: center;
         font-weight: 600;
         font-size: 1rem;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+      }
+
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none; /* shown via JS when photo_url exists */
+      }
+
+      .avatar-initial {
+        display: block;
+      }
+
+      .avatar:focus {
+        outline: 2px solid #38bdf8;
+        outline-offset: 2px;
       }
 
       .student-meta {
@@ -196,7 +215,7 @@
       }
 
       .progress-att {
-        width: 92%;
+        width: 0%;
         background: linear-gradient(90deg, #22c55e, #4ade80);
       }
 
@@ -282,13 +301,20 @@
       <header class="topbar">
         <div class="topbar-left">
           <h1>Student Dashboard</h1>
-          <p>Track your attendance, marks, and progress in one place.</p>
+          <p id="subtitle">
+            Track your attendance, marks, and progress in one place.
+          </p>
         </div>
         <div class="student-info">
-          <div class="avatar">S</div>
+          <button class="avatar" id="avatar" type="button">
+            <img id="avatar-img" alt="Student photo" />
+            <span id="avatar-initial" class="avatar-initial">S</span>
+          </button>
           <div class="student-meta">
-            <div>Student Name</div>
-            <div>Roll: 20 · Class: 3rd Sem AIML</div>
+            <div id="student-name">Student Name</div>
+            <div id="student-meta-line">
+              Roll: -- · Class: --
+            </div>
           </div>
         </div>
       </header>
@@ -300,29 +326,52 @@
               <div class="card-title">Attendance summary</div>
               <div class="card-subtitle">This semester</div>
             </div>
-            <span class="pill success">Safe zone</span>
+            <span class="pill success" id="attendance-pill">Loading…</span>
           </div>
 
           <div class="stat-row">
             <span class="stat-label">Overall attendance</span>
-            <span class="stat-value">92%</span>
+            <span class="stat-value" id="overall-att">--%</span>
           </div>
           <div class="progress-track">
-            <div class="progress-bar progress-att"></div>
+            <div class="progress-bar progress-att" id="att-bar"></div>
           </div>
 
           <div class="stat-row">
             <span class="stat-label">Total classes</span>
-            <span class="stat-value">124</span>
+            <span class="stat-value" id="total-classes">--</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Attended</span>
-            <span class="stat-value">114</span>
+            <span class="stat-value" id="attended-classes">--</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Absent</span>
-            <span class="stat-value">10</span>
+            <span class="stat-value" id="absent-classes">--</span>
           </div>
+
+          <div class="stat-row" style="margin-top: 0.75rem;">
+            <span class="stat-label">Recent classes</span>
+            <span
+              class="stat-label"
+              style="font-size: 0.75rem;"
+              id="recent-count"
+            >
+              --
+            </span>
+          </div>
+          <table class="table" id="recent-classes">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- filled by JS -->
+            </tbody>
+          </table>
         </div>
 
         <div class="card">
@@ -331,18 +380,18 @@
               <div class="card-title">Marks snapshot</div>
               <div class="card-subtitle">Internal assessments</div>
             </div>
-            <span class="pill">Last updated: Today</span>
+            <span class="pill" id="marks-updated">Static demo</span>
           </div>
 
           <div class="stat-row">
             <span class="stat-label">Average score</span>
-            <span class="stat-value">78%</span>
+            <span class="stat-value" id="avg-score">78%</span>
           </div>
           <div class="progress-track">
-            <div class="progress-bar progress-marks"></div>
+            <div class="progress-bar progress-marks" id="marks-bar"></div>
           </div>
 
-          <table class="table">
+          <table class="table" id="marks-table">
             <thead>
               <tr>
                 <th>Subject</th>
@@ -371,5 +420,157 @@
         </div>
       </section>
     </main>
+
+    <script>
+      let currentPhotoUrl = null;
+
+      function getRollFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("roll");
+      }
+
+      async function loadStudentDashboard() {
+        const roll = getRollFromUrl();
+
+        if (!roll) {
+          alert("No roll number in URL. Redirecting to login.");
+          window.location.href = "/login";
+          return;
+        }
+
+        console.log("Loaded student dashboard for roll:", roll);
+
+        const metaLine = document.getElementById("student-meta-line");
+        metaLine.textContent = `Roll: ${roll} · Class: loading…`;
+
+        try {
+          const res = await fetch(
+            `/api/students/${encodeURIComponent(roll)}/history`
+          );
+          if (!res.ok) {
+            throw new Error("Failed to fetch history");
+          }
+          const data = await res.json();
+
+          const student = data.student;
+          const history = Array.isArray(data.history) ? data.history : [];
+
+          // Header: name + section + avatar initial/photo
+          const nameEl = document.getElementById("student-name");
+          const avatarInitial = document.getElementById("avatar-initial");
+          const avatarImg = document.getElementById("avatar-img");
+
+          nameEl.textContent = student.name || "Student";
+          avatarInitial.textContent =
+            (student.name && student.name.trim()[0]?.toUpperCase()) || "S";
+
+          // Photo: use photo_url if present
+          currentPhotoUrl = student.photo_url || null;
+          if (currentPhotoUrl) {
+            avatarImg.src = currentPhotoUrl;
+            avatarImg.style.display = "block";
+            avatarInitial.style.display = "none";
+          } else {
+            avatarImg.style.display = "none";
+            avatarInitial.style.display = "block";
+          }
+
+          const sectionText = student.section
+            ? `Section: ${student.section}`
+            : "Section: —";
+          metaLine.textContent = `Roll: ${student.roll_number} · ${sectionText}`;
+
+          // Attendance summary
+          const total = history.length;
+          const present = history.filter((h) => h.status === "present").length;
+          const absent = total - present;
+          const percent = total > 0 ? Math.round((present / total) * 100) : 0;
+
+          document.getElementById("total-classes").textContent = total;
+          document.getElementById("attended-classes").textContent = present;
+          document.getElementById("absent-classes").textContent = absent;
+          document.getElementById("overall-att").textContent = percent + "%";
+
+          const attBar = document.getElementById("att-bar");
+          attBar.style.width = percent + "%";
+
+          const pill = document.getElementById("attendance-pill");
+          if (percent >= 85) {
+            pill.textContent = "Safe zone";
+            pill.classList.add("success");
+            pill.classList.remove("warn");
+          } else if (percent >= 75) {
+            pill.textContent = "Borderline";
+            pill.classList.add("warn");
+            pill.classList.remove("success");
+          } else {
+            pill.textContent = "At risk";
+            pill.classList.add("warn");
+            pill.classList.remove("success");
+          }
+
+          // Recent classes (last 5)
+          const recentBody = document.querySelector(
+            "#recent-classes tbody"
+          );
+          const recentCount = document.getElementById("recent-count");
+          recentBody.innerHTML = "";
+
+          const recent = history.slice(-5).reverse(); // last 5, newest first
+          recentCount.textContent = `${recent.length} shown`;
+
+          recent.forEach((h) => {
+            const tr = document.createElement("tr");
+
+            const dateCell = document.createElement("td");
+            const subjectCell = document.createElement("td");
+            const statusCell = document.createElement("td");
+
+            const d = new Date(h.date || h.marked_at);
+            const dateStr = isNaN(d.getTime())
+              ? h.date || "-"
+              : d.toLocaleDateString();
+
+            dateCell.textContent = dateStr;
+            subjectCell.textContent = h.subject || "-";
+
+            const chip = document.createElement("span");
+            chip.classList.add("chip");
+            if (h.status === "present") {
+              chip.classList.add("good");
+              chip.textContent = "Present";
+            } else {
+              chip.classList.add("low");
+              chip.textContent = "Absent";
+            }
+            statusCell.appendChild(chip);
+
+            tr.appendChild(dateCell);
+            tr.appendChild(subjectCell);
+            tr.appendChild(statusCell);
+            recentBody.appendChild(tr);
+          });
+        } catch (err) {
+          console.error(err);
+          metaLine.textContent = `Roll: ${roll} · Failed to load data`;
+          document.getElementById("overall-att").textContent = "--";
+          const pill = document.getElementById("attendance-pill");
+          pill.textContent = "Error loading";
+          pill.classList.remove("success");
+          pill.classList.add("warn");
+        }
+      }
+
+      // Click avatar to view full photo
+      document.getElementById("avatar").addEventListener("click", () => {
+        if (currentPhotoUrl) {
+          window.open(currentPhotoUrl, "_blank");
+        } else {
+          alert("No photo available for this student yet.");
+        }
+      });
+
+      loadStudentDashboard();
+    </script>
   </body>
 </html>

@@ -989,11 +989,27 @@
           data.forEach((s) => {
             const row = document.createElement('div');
             row.className = 'students-row';
-            const left = document.createElement('div');
-            const right = document.createElement('div');
 
-            left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}`;
-            right.innerHTML = `<span class="meta">${s.section}</span>`;
+            const left = document.createElement('div');
+            left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}<br/><span class="meta">${s.section}</span>`;
+
+            const right = document.createElement('div');
+            right.style.display = 'flex';
+            right.style.alignItems = 'center';
+            right.style.gap = '6px';
+
+            const viewBtn = document.createElement('button');
+            viewBtn.textContent = 'View profile';
+            viewBtn.className = 'btn-small';
+            viewBtn.style.padding = '4px 8px';
+            viewBtn.style.fontSize = '10px';
+
+            viewBtn.addEventListener('click', () => {
+              window.open(`/student?roll=${encodeURIComponent(s.roll_number)}`, '_blank');
+            });
+
+            right.appendChild(viewBtn);
+
             row.appendChild(left);
             row.appendChild(right);
             studentsList.appendChild(row);
