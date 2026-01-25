@@ -1,17 +1,104 @@
 // server.js
 const express = require("express");
 const path = require("path");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const db = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// JWT config – use env var in Codespaces: Settings > Secrets
+const JWT_SECRET = process.env.JWT_SECRET || "super-secret-smarttrack-key";
+const JWT_EXPIRES_IN = "2h";
+
+// Common SmartTrack password for all students (class key)
+const STUDENT_COMMON_PASSWORD =
+  process.env.STUDENT_COMMON_PASSWORD || "AIML2026!";
+
 // Middleware
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Serve static assets from /public (for CSS, images, JS if needed)
 app.use(express.static(path.join(__dirname, "public")));
+
+// ---------- Auth helpers ----------
+
+function signToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+}
+
+function setAuthCookie(res, token) {
+  res.cookie("smarttrack_jwt", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
+  });
+}
+
+function requireAuth(req, res, next) {
+  const token = req.cookies.smarttrack_jwt;
+  if (!token) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // { id, role, email, roll_number }
+    next();
+  } catch (err) {
+    console.error("JWT verify failed:", err.message);
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+}
+
+function requireRole(role) {
+  return (req, res, next) => {
+    if (!req.user || req.user.role !== role) {
+      return res.status(403).json({ error: "Forbidden for this role" });
+    }
+    next();
+  };
+}
+
+// ---------- Simple seed for demo accounts (optional, idempotent) ----------
+
+function ensureDemoUsers() {
+  const count = db
+    .prepare("SELECT COUNT(*) AS c FROM users WHERE email = ?")
+    .get("teacher@college.edu").c;
+
+  if (count === 0) {
+    const now = new Date().toISOString();
+    const teacherHash = bcrypt.hashSync("password123", 10);
+    db.prepare(
+      `
+      INSERT INTO users (email, password_hash, role, roll_number, created_at)
+      VALUES (?, ?, 'teacher', NULL, ?)
+    `
+    ).run("teacher@college.edu", teacherHash, now);
+
+    const studentHash = bcrypt.hashSync("password123", 10);
+    db.prepare(
+      `
+      INSERT INTO users (email, password_hash, role, roll_number, created_at)
+      VALUES (?, ?, 'student', ?, ?)
+    `
+    ).run("student20@college.edu", studentHash, "20", now);
+
+    console.log(
+      "Seeded demo users teacher@college.edu and student20@college.edu"
+    );
+  }
+}
+
+ensureDemoUsers();
+
+// ---------- Public pages ----------
 
 // Landing page
 app.get("/", (req, res) => {
@@ -33,40 +120,110 @@ app.get("/student", (req, res) => {
   res.sendFile(path.join(__dirname, "student.html"));
 });
 
-/**
- * Face login endpoint
- * Expects: { image: base64DataUrl, role: "student" | "teacher" }
- * For now: dummy match that always succeeds with a sample roll/code.
- * Later: plug in real face recognition using students.photo_url and embeddings.
- */
-app.post("/face-login", (req, res) => {
-  try {
-    const { image, role } = req.body;
+// ---------- Auth endpoints ----------
 
-    if (!image) {
+/**
+ * Email/password login with real hashing and JWT cookie.
+ * Expects: { email, password } from login form.
+ * Uses the `users` table.
+ */
+app.post("/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "No image received" });
+        .json({ success: false, message: "Email and password required" });
     }
 
-    // TODO: real face matching with DB (students.photo_url, etc.)
-    if (role === "student") {
-      // Example: pretend we matched roll 20
-      return res.json({ success: true, role: "student", roll: 20 });
-    } else {
-      // Example: pretend we matched teacher code T001
-      return res.json({ success: true, role: "teacher", code: "T001" });
+    const user = db
+      .prepare(
+        `
+      SELECT id, email, password_hash, role, roll_number
+      FROM users
+      WHERE email = ?
+      LIMIT 1
+    `
+      )
+      .get(email);
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
+
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = signToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      roll_number: user.roll_number || null,
+    });
+
+    setAuthCookie(res, token);
+
+    let redirect = "/";
+    if (user.role === "teacher") {
+      redirect = "/teacher";
+    } else if (user.role === "student") {
+      if (!user.roll_number) {
+        return res.status(500).json({
+          success: false,
+          message: "Student user has no linked roll_number",
+        });
+      }
+      redirect = `/student?roll=${encodeURIComponent(user.roll_number)}`;
+    }
+
+    return res.json({
+      success: true,
+      role: user.role,
+      roll: user.roll_number,
+      redirect,
+    });
   } catch (err) {
     console.error(err);
     return res
       .status(500)
-      .json({ success: false, message: "Face login failed" });
+      .json({ success: false, message: "Login failed" });
   }
 });
 
-// Save an attendance session
-app.post("/api/attendance", (req, res) => {
+/**
+ * Logout – clear JWT cookie.
+ */
+app.post("/auth/logout", (req, res) => {
+  res.clearCookie("smarttrack_jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+  res.json({ success: true });
+});
+
+/**
+ * Check current session – used for auto-redirect on login page.
+ */
+app.get("/auth/me", requireAuth, (req, res) => {
+  res.json({
+    ok: true,
+    role: req.user.role,
+    roll: req.user.roll_number || null,
+  });
+});
+
+// ---------- Protected API routes ----------
+
+// Save an attendance session (teacher-only)
+app.post("/api/attendance", requireAuth, requireRole("teacher"), (req, res) => {
   try {
     const { teacherName, subject, section, date, students } = req.body;
 
@@ -84,8 +241,8 @@ app.post("/api/attendance", (req, res) => {
 
     const insertSession = db.prepare(
       `
-      INSERT INTO sessions (teacher_name, subject, section, date, created_at)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO sessions (teacher_name, subject, section, date, created_at, teacher_user_id)
+      VALUES (?, ?, ?, ?, ?, ?)
     `
     );
     const sessionResult = insertSession.run(
@@ -93,7 +250,8 @@ app.post("/api/attendance", (req, res) => {
       subject,
       section,
       date,
-      now
+      now,
+      req.user.id // link session to logged-in teacher
     );
     const sessionId = sessionResult.lastInsertRowid;
 
@@ -146,18 +304,19 @@ app.post("/api/attendance", (req, res) => {
   }
 });
 
-// Get all sessions
-app.get("/api/sessions", (req, res) => {
+// Get all sessions (teacher-only, only this teacher's sessions)
+app.get("/api/sessions", requireAuth, requireRole("teacher"), (req, res) => {
   try {
     const rows = db
       .prepare(
         `
-      SELECT id, teacher_name, subject, section, date, created_at
-      FROM sessions
-      ORDER BY created_at DESC
-    `
+        SELECT id, teacher_name, subject, section, date, created_at
+        FROM sessions
+        WHERE teacher_user_id = ?
+        ORDER BY created_at DESC
+      `
       )
-      .all();
+      .all(req.user.id);
 
     res.json(rows);
   } catch (err) {
@@ -166,140 +325,184 @@ app.get("/api/sessions", (req, res) => {
   }
 });
 
-// Get details for a single session (students + statuses)
-app.get("/api/sessions/:id", (req, res) => {
-  try {
-    const sessionId = parseInt(req.params.id, 10);
-    if (Number.isNaN(sessionId)) {
-      return res.status(400).json({ error: "Invalid session id" });
-    }
+// Get details for a single session (teacher-only)
+app.get(
+  "/api/sessions/:id",
+  requireAuth,
+  requireRole("teacher"),
+  (req, res) => {
+    try {
+      const sessionId = parseInt(req.params.id, 10);
+      if (Number.isNaN(sessionId)) {
+        return res.status(400).json({ error: "Invalid session id" });
+      }
 
-    const session = db
-      .prepare(
-        `
-      SELECT id, teacher_name, subject, section, date, created_at
-      FROM sessions
-      WHERE id = ?
-    `
-      )
-      .get(sessionId);
-
-    if (!session) {
-      return res.status(404).json({ error: "Session not found" });
-    }
-
-    const records = db
-      .prepare(
-        `
-      SELECT
-        students.name,
-        students.roll_number,
-        students.section,
-        attendance.status,
-        attendance.marked_at
-      FROM attendance
-      JOIN students ON students.id = attendance.student_id
-      WHERE attendance.session_id = ?
-      ORDER BY students.roll_number ASC
-    `
-      )
-      .all(sessionId);
-
-    res.json({
-      session,
-      records,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch session details" });
-  }
-});
-
-// List students (optionally by section)
-app.get("/api/students", (req, res) => {
-  try {
-    const { section } = req.query;
-
-    let rows;
-    if (section) {
-      rows = db
+      const session = db
         .prepare(
           `
-        SELECT id, name, roll_number, section, photo_url
-        FROM students
-        WHERE section = ?
-        ORDER BY roll_number ASC
+        SELECT id, teacher_name, subject, section, date, created_at
+        FROM sessions
+        WHERE id = ?
       `
         )
-        .all(section);
-    } else {
-      rows = db
+        .get(sessionId);
+
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+
+      const records = db
         .prepare(
           `
-        SELECT id, name, roll_number, section, photo_url
-        FROM students
-        ORDER BY section ASC, roll_number ASC
+        SELECT
+          students.name,
+          students.roll_number,
+          students.section,
+          attendance.status,
+          attendance.marked_at
+        FROM attendance
+        JOIN students ON students.id = attendance.student_id
+        WHERE attendance.session_id = ?
+        ORDER BY students.roll_number ASC
       `
         )
-        .all();
-    }
+        .all(sessionId);
 
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch students" });
+      res.json({
+        session,
+        records,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch session details" });
+    }
   }
-});
+);
 
-// Add a student
-app.post("/api/students", (req, res) => {
-  try {
-    const { name, rollNumber, section, photoUrl } = req.body;
+// List students (teacher-only)
+app.get(
+  "/api/students",
+  requireAuth,
+  requireRole("teacher"),
+  (req, res) => {
+    try {
+      const { section } = req.query;
 
-    if (!name || !rollNumber || !section) {
-      return res
-        .status(400)
-        .json({ error: "name, rollNumber and section are required" });
-    }
-
-    const existing = db
-      .prepare(
+      let rows;
+      if (section) {
+        rows = db
+          .prepare(
+            `
+          SELECT id, name, roll_number, section, email, photo_url
+          FROM students
+          WHERE section = ?
+          ORDER BY roll_number ASC
         `
-      SELECT id FROM students WHERE roll_number = ? AND section = ?
-    `
-      )
-      .get(rollNumber, section);
+          )
+          .all(section);
+      } else {
+        rows = db
+          .prepare(
+            `
+          SELECT id, name, roll_number, section, email, photo_url
+          FROM students
+          ORDER BY section ASC, roll_number ASC
+        `
+          )
+          .all();
+      }
 
-    if (existing) {
-      return res
-        .status(409)
-        .json({ error: "Student already exists in this section" });
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch students" });
     }
-
-    const insert = db.prepare(
-      `
-      INSERT INTO students (name, roll_number, section, photo_url)
-      VALUES (?, ?, ?, ?)
-    `
-    );
-
-    const result = insert.run(name, rollNumber, section, photoUrl || null);
-
-    res.status(201).json({
-      id: result.lastInsertRowid,
-      name,
-      roll_number: rollNumber,
-      section,
-      photo_url: photoUrl || null,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to add student" });
   }
-});
+);
 
-// Per-student history by roll number
-app.get("/api/students/:roll/history", (req, res) => {
+// Add a student (teacher-only)
+app.post(
+  "/api/students",
+  requireAuth,
+  requireRole("teacher"),
+  (req, res) => {
+    try {
+      const { name, rollNumber, section, photoUrl, email } = req.body;
+
+      if (!name || !rollNumber || !section || !email) {
+        return res
+          .status(400)
+          .json({ error: "name, rollNumber, section and email are required" });
+      }
+
+      const existing = db
+        .prepare(
+          `
+        SELECT id FROM students WHERE roll_number = ? AND section = ?
+      `
+        )
+        .get(rollNumber, section);
+
+      if (existing) {
+        return res
+          .status(409)
+          .json({ error: "Student already exists in this section" });
+      }
+
+      const insertStudent = db.prepare(
+        `
+        INSERT INTO students (name, roll_number, section, email, photo_url)
+        VALUES (?, ?, ?, ?, ?)
+      `
+      );
+
+      const now = new Date().toISOString();
+      const result = insertStudent.run(
+        name,
+        rollNumber,
+        section,
+        email,
+        photoUrl || null
+      );
+
+      // Ensure a user account for this email with common student password
+      const existingUser = db
+        .prepare(
+          `
+          SELECT id FROM users
+          WHERE email = ? AND role = 'student'
+        `
+        )
+        .get(email);
+
+      if (!existingUser) {
+        const hash = bcrypt.hashSync(STUDENT_COMMON_PASSWORD, 10);
+
+        db.prepare(
+          `
+          INSERT INTO users (email, password_hash, role, roll_number, created_at)
+          VALUES (?, ?, 'student', ?, ?)
+        `
+        ).run(email, hash, rollNumber, now);
+      }
+
+      res.status(201).json({
+        id: result.lastInsertRowid,
+        name,
+        roll_number: rollNumber,
+        section,
+        email,
+        photo_url: photoUrl || null,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to add student" });
+    }
+  }
+);
+
+// Per-student history by roll number (student or teacher)
+app.get("/api/students/:roll/history", requireAuth, (req, res) => {
   try {
     const roll = req.params.roll;
 
@@ -310,11 +513,11 @@ app.get("/api/students/:roll/history", (req, res) => {
     const student = db
       .prepare(
         `
-      SELECT id, name, roll_number, section, photo_url
-      FROM students
-      WHERE roll_number = ?
-      LIMIT 1
-    `
+        SELECT id, name, roll_number, section, email, photo_url
+        FROM students
+        WHERE roll_number = ?
+        LIMIT 1
+      `
       )
       .get(roll);
 
@@ -322,21 +525,26 @@ app.get("/api/students/:roll/history", (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
+    // If logged in as student, enforce own roll only
+    if (req.user.role === "student" && req.user.roll_number !== roll) {
+      return res.status(403).json({ error: "Forbidden for this student" });
+    }
+
     const history = db
       .prepare(
         `
-      SELECT
-        sessions.id AS session_id,
-        sessions.date,
-        sessions.subject,
-        sessions.section,
-        attendance.status,
-        attendance.marked_at
-      FROM attendance
-      JOIN sessions ON sessions.id = attendance.session_id
-      WHERE attendance.student_id = ?
-      ORDER BY sessions.date ASC, sessions.created_at ASC
-    `
+        SELECT
+          sessions.id AS session_id,
+          sessions.date,
+          sessions.subject,
+          sessions.section,
+          attendance.status,
+          attendance.marked_at
+        FROM attendance
+        JOIN sessions ON sessions.id = attendance.session_id
+        WHERE attendance.student_id = ?
+        ORDER BY sessions.date ASC, sessions.created_at ASC
+      `
       )
       .all(student.id);
 
