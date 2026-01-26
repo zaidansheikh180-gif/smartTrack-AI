@@ -412,6 +412,34 @@
       transform: translateY(-0.5px);
     }
 
+    .btn-face {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(129, 140, 248, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-face span {
+      font-size: 14px;
+    }
+
+    .btn-face:hover {
+      border-color: rgba(96, 165, 250, 0.95);
+      color: #e0f2fe;
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-0.5px);
+    }
+
     .auth-footnote {
       margin-top: 6px;
       font-size: 10px;
@@ -585,6 +613,16 @@
             <span>↗</span>
           </button>
 
+          <!-- NEW: Face login demo button -->
+          <button
+            class="btn-face"
+            type="button"
+            id="face-login-btn"
+          >
+            Sign in with face (demo)
+            <span>◉</span>
+          </button>
+
           <button class="btn-ghost" type="button" onclick="goDemoTeacher()">
             Skip sign‑in · Open teacher demo
             <span>▢</span>
@@ -595,16 +633,22 @@
           id="status"
           style="font-size: 11px; margin-top: 6px; color: #9ca3af;"
         ></div>
-
-        <div class="auth-footnote">
-          <span
-            >Use the demo accounts:
-            <br />Teacher – teacher@college.edu / password123
-            <br />Student – student20@college.edu / password123</span
-          >
-          <a href="/">Back to landing</a>
-        </div>
       </form>
+
+      <!-- NEW: Face login status text -->
+      <p
+        id="face-login-status"
+        style="font-size: 11px; margin-top: 4px; color: #9ca3af;"
+      ></p>
+
+      <div class="auth-footnote">
+        <span
+          >Use the demo accounts:
+          <br />Teacher – teacher@college.edu / password123
+          <br />Student – student20@college.edu / password123</span
+        >
+        <a href="/">Back to landing</a>
+      </div>
     </section>
   </div>
 
@@ -613,6 +657,9 @@
     const studentExtra = document.getElementById("student-extra");
     const form = document.getElementById("auth-form");
     const statusEl = document.getElementById("status");
+
+    const faceLoginBtn = document.getElementById("face-login-btn");
+    const faceLoginStatus = document.getElementById("face-login-status");
 
     let currentRole = "teacher";
 
@@ -673,6 +720,54 @@
         console.error(err);
         statusEl.textContent = "Error contacting server.";
         statusEl.style.color = "#f97373";
+      }
+    });
+
+    // NEW: face login flow (demo)
+    faceLoginBtn.addEventListener("click", async () => {
+      try {
+        faceLoginStatus.style.color = "#9ca3af";
+        faceLoginStatus.textContent = "";
+        const phrase = prompt(
+          "Enter your face login phrase (demo).\nUse the same phrase you enrolled on the student dashboard."
+        );
+        if (!phrase) {
+          faceLoginStatus.textContent = "Cancelled.";
+          return;
+        }
+
+        faceLoginStatus.textContent = "Checking phrase…";
+
+        const res = await fetch("/auth/face-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ face_token: phrase }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          faceLoginStatus.textContent =
+            data.error || "Face login failed.";
+          faceLoginStatus.style.color = "#f97373";
+          return;
+        }
+
+        faceLoginStatus.textContent =
+          "Face login successful. Redirecting…";
+        faceLoginStatus.style.color = "#4ade80";
+
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        } else if (data.roll) {
+          window.location.href =
+            "/student?roll=" + encodeURIComponent(data.roll);
+        } else {
+          window.location.href = "/";
+        }
+      } catch (err) {
+        console.error(err);
+        faceLoginStatus.textContent = "Error during face login.";
+        faceLoginStatus.style.color = "#f97373";
       }
     });
 

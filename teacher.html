@@ -611,7 +611,7 @@
     <main class="teacher-layout">
       <!-- LEFT COLUMN: subject + roster -->
       <section class="column">
-        <!-- Class details card (no 'Current class' text) -->
+        <!-- Class details card -->
         <section class="card">
           <div class="card-header">
             <div>
@@ -718,13 +718,13 @@
                 <tr>
                   <th style="width: 10%;">Roll</th>
                   <th style="width: 30%;">Name</th>
-                  <th style="width: 18%;">Section</th>
-                  <th style="width: 22%;">Status</th>
-                  <th style="width: 20%;">Notes</th>
+                  <th style="width: 25%;">Email</th>
+                  <th style="width: 15%;">Section</th>
+                  <th style="width: 20%;">Status</th>
                 </tr>
               </thead>
               <tbody id="roster-body">
-                <!-- Rows are dynamically managed in JS or pre-filled manually -->
+                <!-- Rows are dynamically managed in JS -->
               </tbody>
             </table>
             <div class="roster-footer">
@@ -742,7 +742,7 @@
           <div class="card-header">
             <div>
               <div class="card-subtitle">
-                Add students or load a full section roster. Photo will be set later by the student.
+                Add students or load a full section roster. Email is used for login; photo will be set later by the student.
               </div>
             </div>
             <div class="chip-soft">
@@ -763,12 +763,16 @@
           </div>
           <div class="fields-row">
             <div class="field">
+              <label for="student-email-input">Email</label>
+              <input id="student-email-input" type="email" placeholder="e.g., student21@college.edu" />
+            </div>
+            <div class="field">
               <label for="student-section-input">Section</label>
               <input id="student-section-input" type="text" placeholder="e.g., AIML-C" />
             </div>
           </div>
           <button class="btn-small" id="add-student-btn">
-            Add student
+            Add student (with email)
             <span>＋</span>
           </button>
 
@@ -854,6 +858,7 @@
 
     const studentNameInput = document.getElementById("student-name-input");
     const studentRollInput = document.getElementById("student-roll-input");
+    const studentEmailInput = document.getElementById("student-email-input");
     const studentSectionInput = document.getElementById("student-section-input");
     const filterSectionInput = document.getElementById("filter-section-input");
     const studentsList = document.getElementById("students-list");
@@ -946,7 +951,7 @@
       }
     }
 
-    function addRosterRow(roll, name, section, status = "present", notes = "") {
+    function addRosterRow(roll, name, email, section, status = "present") {
       const tr = document.createElement("tr");
 
       const tdRoll = document.createElement("td");
@@ -954,6 +959,9 @@
 
       const tdName = document.createElement("td");
       tdName.textContent = name;
+
+      const tdEmail = document.createElement("td");
+      tdEmail.textContent = email || "";
 
       const tdSection = document.createElement("td");
       tdSection.textContent = section;
@@ -970,14 +978,11 @@
       });
       tdStatus.appendChild(select);
 
-      const tdNotes = document.createElement("td");
-      tdNotes.textContent = notes || "";
-
       tr.appendChild(tdRoll);
       tr.appendChild(tdName);
+      tr.appendChild(tdEmail);
       tr.appendChild(tdSection);
       tr.appendChild(tdStatus);
-      tr.appendChild(tdNotes);
 
       rosterBody.appendChild(tr);
       updateRosterCount();
@@ -1000,13 +1005,15 @@
         const cells = row.querySelectorAll("td");
         const roll = cells[0].textContent.trim();
         const name = cells[1].textContent.trim();
-        const section = cells[2].textContent.trim();
-        const statusSelect = cells[3].querySelector("select");
+        const email = cells[2].textContent.trim();
+        const section = cells[3].textContent.trim();
+        const statusSelect = cells[4].querySelector("select");
         const status = statusSelect ? statusSelect.value : "present";
         if (!roll || !name || !section) return;
         students.push({
           rollNumber: roll,
           name,
+          email: email || null,
           section,
           status,
         });
@@ -1017,6 +1024,7 @@
     async function addStudent() {
       const name = studentNameInput.value.trim();
       const rollNumber = studentRollInput.value.trim();
+      const email = (studentEmailInput.value || "").trim();
       const section =
         studentSectionInput.value.trim() || sectionInput.value.trim();
 
@@ -1029,7 +1037,7 @@
         const res = await fetch("/api/students", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, rollNumber, section }),
+          body: JSON.stringify({ name, rollNumber, email: email || null, section }),
         });
 
         if (!res.ok) {
@@ -1041,6 +1049,7 @@
 
         studentNameInput.value = "";
         studentRollInput.value = "";
+        studentEmailInput.value = "";
 
         if (!studentSectionInput.value && sectionInput.value) {
           studentSectionInput.value = sectionInput.value;
@@ -1083,7 +1092,7 @@
             row.className = "students-row";
 
             const left = document.createElement("div");
-            left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}<br/><span class="meta">${s.section}</span>`;
+            left.innerHTML = `<strong>${s.roll_number}</strong> · ${s.name}<br/><span class="meta">${s.section}</span>${s.email ? `<br/><span class="meta">${s.email}</span>` : ""}`;
 
             const right = document.createElement("div");
             right.style.display = "flex";
@@ -1113,7 +1122,7 @@
 
         clearRoster();
         data.forEach((s) => {
-          addRosterRow(s.roll_number, s.name, s.section);
+          addRosterRow(s.roll_number, s.name, s.email, s.section);
         });
 
         filterSectionInput.value = sec;
@@ -1296,9 +1305,9 @@
 
     function seedDemoRoster() {
       if (rosterBody.children.length > 0) return;
-      addRosterRow("20", "Detroit", "AIML-C", "present");
-      addRosterRow("21", "Sana", "AIML-C", "absent");
-      addRosterRow("22", "Rahul", "AIML-C", "late");
+      addRosterRow("20", "Detroit", "detroit@example.com", "AIML-C", "present");
+      addRosterRow("21", "Sana", "sana@example.com", "AIML-C", "absent");
+      addRosterRow("22", "Rahul", "rahul@example.com", "AIML-C", "late");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
