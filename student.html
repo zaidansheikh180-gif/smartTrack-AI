@@ -2,721 +2,1655 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Student Dashboard · SmartTrack</title>
+    <title>Student Dashboard - SmartTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
-      * {
+      :root {
+        color-scheme: dark;
         box-sizing: border-box;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+      body {
         margin: 0;
-        padding: 0;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
-      }
-
-      body {
-        background: #0f172a;
+        background: radial-gradient(circle at top left, #020617, #000000 50%);
         color: #e5e7eb;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .page {
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
       }
-
-      .sidebar {
-        width: 260px;
-        background: #020617;
-        padding: 1.5rem 1rem;
-        border-right: 1px solid #1f2937;
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(12px);
+        background: linear-gradient(
+          to right,
+          rgba(15, 23, 42, 0.95),
+          rgba(2, 6, 23, 0.95)
+        );
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
       }
-
-      .logo {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin-bottom: 2rem;
-        color: #38bdf8;
-      }
-
-      .nav-section-title {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #6b7280;
-        margin: 1.5rem 0 0.5rem;
-      }
-
-      .nav-item {
-        padding: 0.55rem 0.8rem;
-        border-radius: 0.5rem;
-        font-size: 0.9rem;
-        color: #d1d5db;
-        cursor: pointer;
-      }
-
-      .nav-item.active {
-        background: #111827;
-        color: #f9fafb;
-        border: 1px solid #1d4ed8;
-      }
-
-      .nav-item:hover {
-        background: #020617;
-      }
-
-      .main {
-        flex: 1;
-        padding: 1.5rem 2rem;
-      }
-
-      .topbar {
+      .header-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0.75rem 1.25rem;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        justify-content: space-between;
       }
-
-      .topbar-left h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
-      }
-
-      .topbar-left p {
-        font-size: 0.85rem;
-        color: #9ca3af;
-      }
-
-      .student-info {
+      .header-left {
         display: flex;
         align-items: center;
         gap: 0.75rem;
       }
-
-      .avatar {
-        width: 40px;
-        height: 40px;
+      .logo {
+        width: 32px;
+        height: 32px;
         border-radius: 999px;
-        background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+        background: radial-gradient(circle, #4f46e5, #1d4ed8);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
-        font-size: 1rem;
-        overflow: hidden;
-        border: none;
-        cursor: pointer;
+        color: #eef2ff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.4),
+          0 10px 25px rgba(15, 23, 42, 0.7);
       }
-
-      .avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: none; /* shown via JS when photo_url exists */
-      }
-
-      .avatar-initial {
-        display: block;
-      }
-
-      .avatar:focus {
-        outline: 2px solid #38bdf8;
-        outline-offset: 2px;
-      }
-
-      .student-meta {
-        font-size: 0.85rem;
-      }
-
-      .student-meta div:first-child {
-        color: #e5e7eb;
-      }
-
-      .student-meta div:last-child {
-        color: #9ca3af;
-        font-size: 0.8rem;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: 2fr 1.5fr;
-        gap: 1.25rem;
-        margin-top: 0.5rem;
-      }
-
-      .card {
-        background: #020617;
-        border-radius: 0.75rem;
-        padding: 1rem 1.1rem;
-        border: 1px solid #1f2937;
-      }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 0.7rem;
-      }
-
-      .card-title {
-        font-size: 0.95rem;
-        font-weight: 500;
-      }
-
-      .card-subtitle {
-        font-size: 0.75rem;
-        color: #6b7280;
-      }
-
-      .pill {
-        font-size: 0.75rem;
-        padding: 0.15rem 0.5rem;
-        border-radius: 999px;
-        border: 1px solid #1f2937;
-        color: #9ca3af;
-      }
-
-      .pill.success {
-        border-color: #16a34a33;
-        color: #4ade80;
-        background: #022c2255;
-      }
-
-      .pill.warn {
-        border-color: #f9731633;
-        color: #fdba74;
-        background: #451a0355;
-      }
-
-      .stat-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.85rem;
-        margin: 0.35rem 0;
-      }
-
-      .stat-label {
-        color: #9ca3af;
-      }
-
-      .stat-value {
-        color: #e5e7eb;
-        font-weight: 500;
-      }
-
-      .progress-track {
-        height: 6px;
-        border-radius: 999px;
-        background: #020617;
-        border: 1px solid #111827;
-        margin-top: 0.35rem;
-        overflow: hidden;
-      }
-
-      .progress-bar {
-        height: 100%;
-        border-radius: inherit;
-      }
-
-      .progress-att {
-        width: 0%;
-        background: linear-gradient(90deg, #22c55e, #4ade80);
-      }
-
-      .progress-marks {
-        width: 78%;
-        background: linear-gradient(90deg, #3b82f6, #38bdf8);
-      }
-
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 0.5rem;
-        font-size: 0.8rem;
-      }
-
-      .table th,
-      .table td {
-        text-align: left;
-        padding: 0.4rem 0.25rem;
-      }
-
-      .table th {
-        color: #9ca3af;
-        font-weight: 500;
-        border-bottom: 1px solid #1f2937;
-      }
-
-      .table tr + tr td {
-        border-top: 1px solid #020617;
-      }
-
-      .chip {
-        font-size: 0.75rem;
-        padding: 0.1rem 0.4rem;
-        border-radius: 999px;
-      }
-
-      .chip.good {
-        background: #022c22;
-        color: #4ade80;
-      }
-
-      .chip.low {
-        background: #451a03;
-        color: #fdba74;
-      }
-
-      /* Profile photo upload card */
-      .profile-card {
-        margin-top: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .profile-card img {
-        width: 72px;
-        height: 72px;
-        border-radius: 999px;
-        object-fit: cover;
-        border: 1px solid #1f2937;
-        background: #020617;
-      }
-
-      .profile-card-controls {
+      .brand-text {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
-        font-size: 0.8rem;
       }
-
-      .profile-card-controls input[type="file"] {
-        font-size: 0.8rem;
-      }
-
-      .btn-small {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.3rem 0.7rem;
-        border-radius: 999px;
-        border: 1px solid #374151;
-        background: #020617;
+      .brand-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
         color: #e5e7eb;
+      }
+      .brand-subtitle {
+        font-size: 0.75rem;
+        color: #9ca3af;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
+      }
+      .user-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: radial-gradient(circle, #22c55e, #16a34a);
+        border: 1px solid rgba(34, 197, 94, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #ecfdf5;
+        padding: 0;
+      }
+      .user-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .user-name {
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      .user-role {
+        font-size: 0.7rem;
+        color: #9ca3af;
+      }
+      .logout-btn {
+        background: none;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        color: #e5e7eb;
+        padding: 0.3rem 0.65rem;
+        border-radius: 999px;
         font-size: 0.75rem;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.17s ease;
       }
-
-      .btn-small:hover {
-        background: #111827;
+      .logout-btn:hover {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: #f97373;
+        color: #fecaca;
       }
-
-      @media (max-width: 900px) {
-        body {
-          flex-direction: column;
-        }
-        .sidebar {
-          width: 100%;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.25rem;
-        }
-        .main {
-          padding: 1rem;
-        }
-        .grid {
+      .logout-icon {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+      }
+      main {
+        flex: 1;
+      }
+      .main-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 2rem;
+        display: grid;
+        grid-template-columns: 2.1fr 1.1fr;
+        gap: 1.5rem;
+      }
+      @media (max-width: 960px) {
+        .main-inner {
           grid-template-columns: 1fr;
         }
       }
+      .card {
+        background: radial-gradient(circle at top left, #020617, #020617 45%);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.9);
+        padding: 1.25rem 1.3rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: radial-gradient(
+          circle at top right,
+          rgba(56, 189, 248, 0.16),
+          transparent 55%
+        );
+        opacity: 0.8;
+        pointer-events: none;
+      }
+      .card-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .card-pill {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(94, 234, 212, 0.7);
+        color: #a5f3fc;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .card-subtitle {
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+      .profile-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.1fr);
+        gap: 1rem;
+      }
+      @media (max-width: 800px) {
+        .profile-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .field-group {
+        margin-bottom: 0.9rem;
+      }
+      .field-label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-bottom: 0.25rem;
+      }
+      .field-input {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 0.85rem;
+      }
+      .field-input:focus {
+        outline: none;
+        border-color: rgba(94, 234, 212, 0.9);
+        box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.4);
+      }
+      .field-input[readonly] {
+        opacity: 0.7;
+      }
+      .inline-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      @media (max-width: 600px) {
+        .inline-fields {
+          grid-template-columns: 1fr;
+        }
+      }
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.35rem;
+      }
+      .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.9);
+      }
+      .badge--accent {
+        border-color: rgba(94, 234, 212, 0.8);
+        color: #a5f3fc;
+      }
+      .badge--soft {
+        border-style: dashed;
+        border-color: rgba(148, 163, 184, 0.7);
+      }
+      .profile-photo-card {
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: radial-gradient(
+            circle at top,
+            rgba(37, 99, 235, 0.18),
+            transparent 56%
+          ),
+          rgba(15, 23, 42, 0.96);
+        padding: 0.9rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .profile-photo-card::after {
+        content: "";
+        position: absolute;
+        inset: -120%;
+        background-image: radial-gradient(
+          circle at 0 0,
+          rgba(96, 165, 250, 0.18),
+          transparent 55%
+        );
+        transform: translate3d(-10%, -15%, 0);
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      .photo-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 1;
+      }
+      .photo-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .photo-chip {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(191, 219, 254, 0.9);
+        background: rgba(15, 23, 42, 0.98);
+        color: #dbeafe;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+      }
+      .photo-body {
+        display: flex;
+        margin-top: 0.6rem;
+        gap: 0.8rem;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      .photo-preview-shell {
+        width: 92px;
+        height: 92px;
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: radial-gradient(circle at top, #020617, #020617 70%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.9);
+      }
+      .photo-preview-shell::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: radial-gradient(
+          circle at top,
+          rgba(59, 130, 246, 0.28),
+          transparent 65%
+        );
+        opacity: 0.9;
+        pointer-events: none;
+      }
+      .photo-preview {
+        width: 82px;
+        height: 82px;
+        border-radius: 0.9rem;
+        object-fit: cover;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+      }
+      .photo-fallback {
+        width: 82px;
+        height: 82px;
+        border-radius: 0.9rem;
+        border: 1px dashed rgba(148, 163, 184, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        color: #9ca3af;
+        background: rgba(15, 23, 42, 0.9);
+      }
+      .photo-meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .photo-meta-line {
+        font-size: 0.78rem;
+        color: #9ca3af;
+      }
+      .photo-meta-highlight {
+        font-size: 0.78rem;
+        color: #d1fae5;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .photo-meta-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
+      }
+      .photo-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+        position: relative;
+        z-index: 1;
+      }
+      .photo-actions-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .btn {
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 0.8rem;
+        padding: 0.45rem 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+        transition: all 0.17s ease;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.8);
+      }
+      .btn-primary {
+        background: radial-gradient(circle at top left, #4f46e5, #1d4ed8);
+        border-color: rgba(129, 140, 248, 0.9);
+      }
+      .btn-primary:hover {
+        filter: brightness(1.06);
+        box-shadow: 0 14px 30px rgba(30, 64, 175, 0.9);
+      }
+      .btn-ghost {
+        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(148, 163, 184, 0.7);
+      }
+      .btn-ghost:hover {
+        border-color: rgba(129, 140, 248, 0.9);
+        color: #e0e7ff;
+      }
+      .btn-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+      }
+      .metrics-row {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.8rem;
+      }
+      @media (max-width: 720px) {
+        .metrics-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .metric-card {
+        border-radius: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 42, 0.96),
+          rgba(15, 23, 42, 0.98)
+        );
+        padding: 0.65rem 0.7rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .metric-label {
+        font-size: 0.75rem;
+        color: #9ca3af;
+      }
+      .metric-value-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.35rem;
+        margin-top: 0.2rem;
+      }
+      .metric-value {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .metric-pill {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(52, 211, 153, 0.8);
+        color: #bbf7d0;
+        background: rgba(6, 78, 59, 0.6);
+      }
+      .metric-pill-soft {
+        border-color: rgba(248, 250, 252, 0.15);
+        color: #e5e7eb;
+        background: rgba(15, 23, 42, 0.7);
+      }
+      .tab-row {
+        display: inline-flex;
+        padding: 0.25rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.92);
+        gap: 0.15rem;
+      }
+      .tab {
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: none;
+        color: #9ca3af;
+        background: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.17s ease;
+      }
+      .tab--active {
+        color: #e5e7eb;
+        background: radial-gradient(circle at top left, #4f46e5, #1d4ed8);
+        box-shadow: 0 10px 22px rgba(30, 64, 175, 0.9);
+      }
+      .tab-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.7);
+      }
+      .tab-dot--active {
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.4);
+      }
+      .attendance-summary {
+        margin-top: 0.8rem;
+      }
+      .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.6rem;
+        font-size: 0.8rem;
+      }
+      .attendance-table thead {
+        background: rgba(15, 23, 42, 0.98);
+      }
+      .attendance-table th,
+      .attendance-table td {
+        padding: 0.45rem 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      }
+      .attendance-table th {
+        font-weight: 500;
+        color: #9ca3af;
+        font-size: 0.75rem;
+      }
+      .badge-attendance {
+        padding: 0.15rem 0.4rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .badge-attendance-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+      }
+      .badge-attendance-dot--good {
+        background: #22c55e;
+      }
+      .badge-attendance-dot--warn {
+        background: #f97316;
+      }
+      .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .upcoming-card {
+        background: radial-gradient(circle at top, #020617, #020617 60%);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+        padding: 1rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .upcoming-card::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: inherit;
+        background: radial-gradient(
+          circle at top right,
+          rgba(52, 211, 153, 0.16),
+          transparent 60%
+        );
+        opacity: 0.9;
+        pointer-events: none;
+      }
+      .upcoming-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 1;
+      }
+      .upcoming-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .upcoming-chip {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(52, 211, 153, 0.8);
+        color: #bbf7d0;
+        background: rgba(15, 23, 42, 0.9);
+      }
+      .upcoming-body {
+        margin-top: 0.75rem;
+        position: relative;
+        z-index: 1;
+      }
+      .upcoming-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+      }
+      .upcoming-item {
+        border-radius: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.98);
+        padding: 0.5rem 0.55rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .upcoming-item-main {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .upcoming-item-title {
+        font-weight: 500;
+      }
+      .upcoming-item-meta {
+        font-size: 0.75rem;
+        color: #9ca3af;
+      }
+      .upcoming-item-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.25rem;
+      }
+      .pill-soft {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.98);
+      }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.72rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.98);
+        color: #9ca3af;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+      }
+      .error-banner {
+        margin-top: 0.75rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(239, 68, 68, 0.7);
+        background: rgba(127, 29, 29, 0.9);
+        color: #fee2e2;
+        padding: 0.5rem 0.6rem;
+        font-size: 0.78rem;
+        display: none;
+      }
+      .enroll-face-btn {
+        margin-top: 0.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(129, 140, 248, 0.9);
+        background: rgba(15, 23, 42, 0.98);
+        color: #e5e7eb;
+        font-size: 0.78rem;
+        padding: 0.4rem 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.8);
+        transition: all 0.17s ease;
+      }
+      .enroll-face-btn:hover {
+        border-color: rgba(96, 165, 250, 0.9);
+        color: #e0f2fe;
+      }
+      .save-profile-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.78rem;
+      }
+      .save-status {
+        font-size: 0.78rem;
+        color: #9ca3af;
+      }
     </style>
   </head>
+
   <body>
-    <aside class="sidebar">
-      <div class="logo">SmartTrack · Student</div>
-
-      <div class="nav-section-title">Main</div>
-      <div class="nav-item active">Overview</div>
-      <div class="nav-item">Attendance</div>
-      <div class="nav-item">Marks & Exams</div>
-      <div class="nav-item">Assignments</div>
-
-      <div class="nav-section-title">Support</div>
-      <div class="nav-item">Messages</div>
-      <div class="nav-item">Help & FAQ</div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div class="topbar-left">
-          <h1>Student Dashboard</h1>
-          <p id="subtitle">
-            Track your attendance, marks, and progress in one place.
-          </p>
-        </div>
-        <div class="student-info">
-          <button class="avatar" id="avatar" type="button">
-            <img id="avatar-img" alt="Student photo" />
-            <span id="avatar-initial" class="avatar-initial">S</span>
-          </button>
-          <div class="student-meta">
-            <div id="student-name">Student Name</div>
-            <div id="student-meta-line">
-              Roll: -- · Class: --
+    <div class="page">
+      <header>
+        <div class="header-inner">
+          <div class="header-left">
+            <div class="logo">ST</div>
+            <div class="brand-text">
+              <div class="brand-title">SmartTrack</div>
+              <div class="brand-subtitle">Student Dashboard</div>
             </div>
+          </div>
+          <div class="header-right">
+            <div class="user-pill" id="user-pill">
+              <button
+                id="user-avatar-button"
+                type="button"
+                class="user-avatar"
+                style="border:none;background:none;padding:0;cursor:pointer;"
+              >
+                <span id="user-avatar-initials">ST</span>
+                <img
+                  id="user-avatar-photo"
+                  src=""
+                  alt="Avatar"
+                  style="display:none;width:100%;height:100%;border-radius:999px;object-fit:cover;"
+                />
+              </button>
+              <div class="user-info">
+                <div class="user-name" id="user-name-pill">Student</div>
+                <div class="user-role">Student</div>
+              </div>
+            </div>
+            <button class="logout-btn" id="logout-btn">
+              <span class="logout-icon">⟵</span>
+              <span>Log out</span>
+            </button>
           </div>
         </div>
       </header>
 
-      <!-- Profile photo upload (option 1) -->
-      <section class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Profile photo</div>
-            <div class="card-subtitle">
-              This single photo is used for your profile and face login demo.
+      <main>
+        <div class="main-inner">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  Student profile
+                  <span class="card-pill">
+                    <span
+                      style="
+                        width: 7px;
+                        height: 7px;
+                        border-radius: 999px;
+                        background: #22c55e;
+                      "
+                    ></span>
+                    In sync with server
+                  </span>
+                </div>
+                <div class="card-subtitle">
+                  View and update your details, keep an eye on your attendance
+                  and schedule.
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="profile-card">
-          <img
-            id="photo-preview"
-            src="/images/default-avatar.png"
-            alt="Profile photo"
-          />
-          <div class="profile-card-controls">
-            <span>Choose a clear front-facing photo.</span>
-            <input
-              id="photo-input"
-              type="file"
-              accept="image/*"
-            />
-            <button class="btn-small" id="save-photo-btn">
-              Save photo
-            </button>
-            <span id="photo-hint" style="color:#9ca3af;">
-              If you update this, the system will use the new image for login.
-            </span>
-          </div>
-        </div>
-      </section>
 
-      <section class="grid">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Attendance summary</div>
-              <div class="card-subtitle">This semester</div>
+            <div class="profile-grid">
+              <div>
+                <div class="field-group">
+                  <div class="field-label">Full name</div>
+                  <input
+                    id="student-name"
+                    class="field-input"
+                    type="text"
+                    placeholder="Loading..."
+                    readonly
+                  />
+                </div>
+
+                <div class="field-group inline-fields">
+                  <div>
+                    <div class="field-label">Roll number</div>
+                    <input
+                      id="student-roll"
+                      class="field-input"
+                      type="text"
+                      placeholder="Loading..."
+                      readonly
+                    />
+                  </div>
+                  <div>
+                    <div class="field-label">USN</div>
+                    <input
+                      id="student-usn"
+                      class="field-input"
+                      type="text"
+                      placeholder="Enter your USN"
+                    />
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <div class="field-label">Semester</div>
+                  <input
+                    id="student-semester"
+                    class="field-input"
+                    type="text"
+                    placeholder="Enter your semester"
+                  />
+                </div>
+
+                <div class="field-group inline-fields">
+                  <div>
+                    <div class="field-label">Section</div>
+                    <input
+                      id="student-section"
+                      class="field-input"
+                      type="text"
+                      placeholder="Loading..."
+                      readonly
+                    />
+                  </div>
+                  <div>
+                    <div class="field-label">Email</div>
+                    <input
+                      id="student-email"
+                      class="field-input"
+                      type="email"
+                      placeholder="Loading..."
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <div class="field-label">Badges</div>
+                  <div class="badge-row" id="badge-row">
+                    <span class="badge badge--accent">AI-ready profile</span>
+                    <span class="badge badge--soft">Attendance analytics</span>
+                  </div>
+                </div>
+
+                <div class="save-profile-row">
+                  <button id="save-profile" class="btn btn-primary">
+                    <span class="btn-icon">✓</span>
+                    <span>Save profile</span>
+                  </button>
+                  <span id="save-profile-status" class="save-status"></span>
+                </div>
+
+                <div class="metrics-row">
+                  <div class="metric-card" id="metric-attendance">
+                    <div class="metric-label">Overall attendance</div>
+                    <div class="metric-value-row">
+                      <div class="metric-value" id="overall-attendance">
+                        --
+                      </div>
+                      <span
+                        class="metric-pill"
+                        id="overall-attendance-pill"
+                      >
+                        loading
+                      </span>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Last 7 days</div>
+                    <div class="metric-value-row">
+                      <div class="metric-value" id="last7-score">--</div>
+                      <span class="metric-pill-soft" id="last7-pill">
+                        loading
+                      </span>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Risk alerts</div>
+                    <div class="metric-value-row">
+                      <div class="metric-value" id="risk-count">--</div>
+                      <span class="metric-pill-soft" id="risk-pill">
+                        loading
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="profile-photo-card">
+                  <div class="photo-header">
+                    <div class="photo-title">
+                      <span>Profile photo</span>
+                      <span class="photo-chip">
+                        <span
+                          style="
+                            width: 8px;
+                            height: 8px;
+                            border-radius: 999px;
+                            background: #22c55e;
+                          "
+                        ></span>
+                        Synced
+                      </span>
+                    </div>
+                    <span
+                      style="
+                        font-size: 0.7rem;
+                        color: #9ca3af;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.25rem;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 6px;
+                          height: 6px;
+                          border-radius: 999px;
+                          background: #38bdf8;
+                        "
+                      ></span>
+                      SmartTrack Photos
+                    </span>
+                  </div>
+
+                  <div class="photo-body">
+                    <div class="photo-preview-shell">
+                      <img
+                        id="photo-preview"
+                        class="photo-preview"
+                        src=""
+                        alt="Profile photo"
+                        style="display: none"
+                      />
+                      <div id="photo-fallback" class="photo-fallback">
+                        No photo yet
+                      </div>
+                    </div>
+                    <div class="photo-meta">
+                      <div class="photo-meta-line">
+                        You can add a clear and recent photo of yourself.
+                      </div>
+                      <div class="photo-meta-highlight">
+                        <span class="photo-meta-dot"></span>
+                        This photo is only used for your profile and student
+                        dashboard.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="photo-actions">
+                    <div class="photo-actions-row">
+                      <button
+                        id="upload-photo-btn"
+                        type="button"
+                        class="btn btn-ghost"
+                      >
+                        <span class="btn-icon">+</span>
+                        <span>Upload photo</span>
+                      </button>
+                      <button
+                        id="save-photo-btn"
+                        type="button"
+                        class="btn btn-primary"
+                      >
+                        <span class="btn-icon">✓</span>
+                        <span>Save photo</span>
+                      </button>
+                    </div>
+                    <p
+                      style="
+                        margin-top: 0.25rem;
+                        color: #9ca3af;
+                        font-size: 0.875rem;
+                      "
+                    >
+                      Updating this will only change how your profile looks in
+                      SmartTrack.
+                    </p>
+                    <button
+                      id="enroll-face-btn"
+                      type="button"
+                      class="enroll-face-btn"
+                    >
+                      <span class="btn-icon">★</span>
+                      <span>Enroll face login demo</span>
+                    </button>
+                    <p
+                      id="enroll-face-status"
+                      style="
+                        margin-top: 0.25rem;
+                        color: #9ca3af;
+                        font-size: 0.78rem;
+                      "
+                    ></p>
+                  </div>
+                </div>
+
+                <div class="attendance-summary">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      gap: 0.75rem;
+                      margin-bottom: 0.5rem;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 0.4rem;
+                      "
+                    >
+                      <span
+                        style="font-size: 0.9rem; font-weight: 500"
+                      >
+                        Attendance insights
+                      </span>
+                      <span class="status-pill">
+                        <span class="status-dot"></span>
+                        Auto-updated daily
+                      </span>
+                    </div>
+                    <div class="tab-row">
+                      <button
+                        class="tab tab--active"
+                        data-tab="today"
+                        id="tab-today"
+                      >
+                        <span class="tab-dot tab-dot--active"></span>
+                        Today
+                      </button>
+                      <button
+                        class="tab"
+                        data-tab="week"
+                        id="tab-week"
+                      >
+                        <span class="tab-dot"></span>
+                        This week
+                      </button>
+                      <button
+                        class="tab"
+                        data-tab="month"
+                        id="tab-month"
+                      >
+                        <span class="tab-dot"></span>
+                        This month
+                      </button>
+                    </div>
+                  </div>
+
+                  <table
+                    class="attendance-table"
+                    id="attendance-table"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Subject</th>
+                        <th>Attended</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="attendance-body">
+                      <tr>
+                        <td
+                          colspan="4"
+                          style="text-align: center; color: #6b7280"
+                        >
+                          Loading attendance...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div class="error-banner" id="attendance-error"></div>
+                </div>
+              </div>
             </div>
-            <span class="pill success" id="attendance-pill">Loading…</span>
-          </div>
+          </section>
 
-          <div class="stat-row">
-            <span class="stat-label">Overall attendance</span>
-            <span class="stat-value" id="overall-att">--%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-bar progress-att" id="att-bar"></div>
-          </div>
-
-          <div class="stat-row">
-            <span class="stat-label">Total classes</span>
-            <span class="stat-value" id="total-classes">--</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Attended</span>
-            <span class="stat-value" id="attended-classes">--</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Absent</span>
-            <span class="stat-value" id="absent-classes">--</span>
-          </div>
-
-          <div class="stat-row" style="margin-top: 0.75rem;">
-            <span class="stat-label">Recent classes</span>
-            <span
-              class="stat-label"
-              style="font-size: 0.75rem;"
-              id="recent-count"
-            >
-              --
-            </span>
-          </div>
-          <table class="table" id="recent-classes">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Subject</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- filled by JS -->
-            </tbody>
-          </table>
+          <aside class="right-column">
+            <section class="upcoming-card">
+              <div class="upcoming-header">
+                <div class="upcoming-title">
+                  Upcoming classes
+                  <span class="upcoming-chip">Today & tomorrow</span>
+                </div>
+                <div class="card-subtitle">
+                  Quick view of the next few lectures based on your timetable.
+                </div>
+              </div>
+              <div class="upcoming-body">
+                <div id="upcoming-list" class="upcoming-list">
+                  <div
+                    class="upcoming-item"
+                    id="upcoming-loading"
+                    style="color: #9ca3af"
+                  >
+                    Loading timetable...
+                  </div>
+                </div>
+              </div>
+            </section>
+          </aside>
         </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Marks snapshot</div>
-              <div class="card-subtitle">Internal assessments</div>
-            </div>
-            <span class="pill" id="marks-updated">Static demo</span>
-          </div>
-
-          <div class="stat-row">
-            <span class="stat-label">Average score</span>
-            <span class="stat-value" id="avg-score">78%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-bar progress-marks" id="marks-bar"></div>
-          </div>
-
-          <table class="table" id="marks-table">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Marks</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Maths for ML</td>
-                <td>82 / 100</td>
-                <td><span class="chip good">Good</span></td>
-              </tr>
-              <tr>
-                <td>Python</td>
-                <td>75 / 100</td>
-                <td><span class="chip good">Okay</span></td>
-              </tr>
-              <tr>
-                <td>DSA</td>
-                <td>69 / 100</td>
-                <td><span class="chip low">Needs focus</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+      </main>
+    </div>
 
     <script>
-      let currentPhotoUrl = null;
-      let currentPhotoBase64 = null;
+      const params = new URLSearchParams(window.location.search);
+      const roll = params.get("roll");
 
-      function getRollFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get("roll");
+      const studentNameInput = document.getElementById("student-name");
+      const studentRollInput = document.getElementById("student-roll");
+      const studentSemesterInput = document.getElementById("student-semester");
+      const studentSectionInput = document.getElementById("student-section");
+      const studentEmailInput = document.getElementById("student-email");
+      const studentUsnInput = document.getElementById("student-usn");
+
+      const userNamePill = document.getElementById("user-name-pill");
+      const userAvatarButton = document.getElementById("user-avatar-button");
+      const userAvatarInitials =
+        document.getElementById("user-avatar-initials");
+      const userAvatarPhoto = document.getElementById("user-avatar-photo");
+
+      const overallAttendanceEl =
+        document.getElementById("overall-attendance");
+      const overallAttendancePill = document.getElementById(
+        "overall-attendance-pill"
+      );
+      const last7ScoreEl = document.getElementById("last7-score");
+      const last7Pill = document.getElementById("last7-pill");
+      const riskCountEl = document.getElementById("risk-count");
+      const riskPill = document.getElementById("risk-pill");
+
+      const attendanceBody = document.getElementById("attendance-body");
+      const attendanceError = document.getElementById("attendance-error");
+      const tabToday = document.getElementById("tab-today");
+      const tabWeek = document.getElementById("tab-week");
+      const tabMonth = document.getElementById("tab-month");
+
+      const photoPreview = document.getElementById("photo-preview");
+      const photoFallback = document.getElementById("photo-fallback");
+      const uploadPhotoBtn = document.getElementById("upload-photo-btn");
+      const savePhotoBtn = document.getElementById("save-photo-btn");
+      const enrollFaceBtn = document.getElementById("enroll-face-btn");
+      const enrollFaceStatus =
+        document.getElementById("enroll-face-status");
+
+      const upcomingList = document.getElementById("upcoming-list");
+      const logoutBtn = document.getElementById("logout-btn");
+
+      const saveProfileBtn = document.getElementById("save-profile");
+      const saveProfileStatus =
+        document.getElementById("save-profile-status");
+
+      if (!roll) {
+        if (attendanceError) {
+          attendanceError.style.display = "block";
+          attendanceError.textContent =
+            "Missing roll number in URL. Please go back to the login page.";
+        }
       }
 
-      async function loadStudentDashboard() {
-        const roll = getRollFromUrl();
+      function setInitials(name) {
+        if (!name) return "ST";
+        const parts = name
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2);
+        const initials = parts
+          .map((p) => p[0].toUpperCase())
+          .join("");
+        return initials || "ST";
+      }
 
-        if (!roll) {
-          alert("No roll number in URL. Redirecting to login.");
-          window.location.href = "/login";
-          return;
-        }
-
-        console.log("Loaded student dashboard for roll:", roll);
-
-        const metaLine = document.getElementById("student-meta-line");
-        metaLine.textContent = `Roll: ${roll} · Class: loading…`;
-
+      async function fetchStudentProfile() {
         try {
           const res = await fetch(
-            `/api/students/${encodeURIComponent(roll)}/history`
+            `/api/student/profile?roll=${encodeURIComponent(roll)}`
           );
-          if (!res.ok) {
-            throw new Error("Failed to fetch history");
-          }
           const data = await res.json();
-
-          const student = data.student;
-          const history = Array.isArray(data.history) ? data.history : [];
-
-          // Header: name + section + avatar initial/photo
-          const nameEl = document.getElementById("student-name");
-          const avatarInitial = document.getElementById("avatar-initial");
-          const avatarImg = document.getElementById("avatar-img");
-
-          nameEl.textContent = student.name || "Student";
-          avatarInitial.textContent =
-            (student.name && student.name.trim()[0]?.toUpperCase()) || "S";
-
-          // Photo: use photo_url if present
-          currentPhotoUrl = student.photo_url || null;
-          if (currentPhotoUrl) {
-            avatarImg.src = currentPhotoUrl;
-            avatarImg.style.display = "block";
-            avatarInitial.style.display = "none";
-
-            const profilePreview = document.getElementById("photo-preview");
-            if (profilePreview) {
-              profilePreview.src = currentPhotoUrl;
-            }
-          } else {
-            avatarImg.style.display = "none";
-            avatarInitial.style.display = "block";
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Failed to load profile");
           }
 
-          const sectionText = student.section
-            ? `Section: ${student.section}`
-            : "Section: —";
-          metaLine.textContent = `Roll: ${student.roll_number} · ${sectionText}`;
+          const s = data.student;
 
-          // Attendance summary
-          const total = history.length;
-          const present = history.filter((h) => h.status === "present").length;
-          const absent = total - present;
-          const percent = total > 0 ? Math.round((present / total) * 100) : 0;
+          studentNameInput.value = s.name || "";
+          studentRollInput.value = s.roll_number || "";
+          studentSemesterInput.value = s.semester || "";
+          studentSectionInput.value = s.section || "";
+          studentEmailInput.value = s.email || "";
+          studentUsnInput.value = s.usn || s.registration_number || "";
 
-          document.getElementById("total-classes").textContent = total;
-          document.getElementById("attended-classes").textContent = present;
-          document.getElementById("absent-classes").textContent = absent;
-          document.getElementById("overall-att").textContent = percent + "%";
+          userNamePill.textContent = s.name
+            ? `${s.name} · Student`
+            : "Student";
+          userAvatarInitials.textContent = setInitials(s.name);
 
-          const attBar = document.getElementById("att-bar");
-          attBar.style.width = percent + "%";
+          if (s.photo_url) {
+            photoPreview.src = s.photo_url;
+            photoPreview.style.display = "block";
+            photoFallback.style.display = "none";
 
-          const pill = document.getElementById("attendance-pill");
-          if (percent >= 85) {
-            pill.textContent = "Safe zone";
-            pill.classList.add("success");
-            pill.classList.remove("warn");
-          } else if (percent >= 75) {
-            pill.textContent = "Borderline";
-            pill.classList.add("warn");
-            pill.classList.remove("success");
+            userAvatarPhoto.src = s.photo_url;
+            userAvatarPhoto.style.display = "block";
+            userAvatarInitials.style.display = "none";
           } else {
-            pill.textContent = "At risk";
-            pill.classList.add("warn");
-            pill.classList.remove("success");
-          }
+            photoPreview.style.display = "none";
+            photoFallback.style.display = "flex";
 
-          // Recent classes (last 5)
-          const recentBody = document.querySelector(
-            "#recent-classes tbody"
+            userAvatarPhoto.style.display = "none";
+            userAvatarInitials.style.display = "block";
+          }
+        } catch (err) {
+          console.error(err);
+          if (attendanceError) {
+            attendanceError.style.display = "block";
+            attendanceError.textContent =
+              "Could not load profile. Please try again later.";
+          }
+        }
+      }
+
+      async function fetchStudentMetrics() {
+        try {
+          const res = await fetch(
+            `/api/student/attendance/metrics?roll=${encodeURIComponent(roll)}`
           );
-          const recentCount = document.getElementById("recent-count");
-          recentBody.innerHTML = "";
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Failed to load metrics");
+          }
 
-          const recent = history.slice(-5).reverse(); // last 5, newest first
-          recentCount.textContent = `${recent.length} shown`;
+          const m = data.metrics;
 
-          recent.forEach((h) => {
+          if (m.overall_percentage != null) {
+            overallAttendanceEl.textContent =
+              m.overall_percentage.toFixed(1) + "%";
+          } else {
+            overallAttendanceEl.textContent = "--";
+          }
+
+          const overall = m.overall_percentage || 0;
+          if (overall >= 85) {
+            overallAttendancePill.textContent = "On track";
+            overallAttendancePill.style.borderColor =
+              "rgba(34,197,94,0.9)";
+          } else if (overall >= 75) {
+            overallAttendancePill.textContent = "Watch list";
+            overallAttendancePill.style.borderColor =
+              "rgba(250,204,21,0.9)";
+          } else {
+            overallAttendancePill.textContent = "At risk";
+            overallAttendancePill.style.borderColor =
+              "rgba(248,113,113,0.9)";
+          }
+
+          if (m.last_7_days_score != null) {
+            last7ScoreEl.textContent = m.last_7_days_score.toFixed(0) + "%";
+          } else {
+            last7ScoreEl.textContent = "--";
+          }
+          last7Pill.textContent = m.last_7_days_comment || "Recent trend";
+
+          if (m.risk_subject_count != null) {
+            riskCountEl.textContent = m.risk_subject_count;
+          } else {
+            riskCountEl.textContent = "--";
+          }
+          riskPill.textContent =
+            m.risk_summary || "Subjects close to shortage";
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      async function fetchAttendanceView(view) {
+        const param =
+          view === "week" ? "week" : view === "month" ? "month" : "today";
+
+        try {
+          attendanceError.style.display = "none";
+          attendanceBody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center;color:#6b7280">Loading attendance...</td></tr>';
+
+          const res = await fetch(
+            `/api/student/attendance?roll=${encodeURIComponent(
+              roll
+            )}&view=${encodeURIComponent(param)}`
+          );
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Failed to load attendance");
+          }
+
+          const rows = data.attendance || [];
+          if (!rows.length) {
+            attendanceBody.innerHTML =
+              '<tr><td colspan="4" style="text-align:center;color:#6b7280">No attendance records for this view.</td></tr>';
+            return;
+          }
+
+          attendanceBody.innerHTML = "";
+          rows.forEach((row) => {
             const tr = document.createElement("tr");
+            const statusSpan = document.createElement("span");
+            statusSpan.className = "badge-attendance";
+            const dot = document.createElement("span");
+            dot.className = "badge-attendance-dot";
 
-            const dateCell = document.createElement("td");
-            const subjectCell = document.createElement("td");
-            const statusCell = document.createElement("td");
-
-            const d = new Date(h.date || h.marked_at);
-            const dateStr = isNaN(d.getTime())
-              ? h.date || "-"
-              : d.toLocaleDateString();
-
-            dateCell.textContent = dateStr;
-            subjectCell.textContent = h.subject || "-";
-
-            const chip = document.createElement("span");
-            chip.classList.add("chip");
-            if (h.status === "present") {
-              chip.classList.add("good");
-              chip.textContent = "Present";
-            } else {
-              chip.classList.add("low");
-              chip.textContent = "Absent";
+            const pct =
+              row.percentage != null ? Number(row.percentage) : 0;
+            if (pct >= 85) {
+              dot.classList.add("badge-attendance-dot--good");
+            } else if (pct >= 75) {
+              dot.classList.add("badge-attendance-dot--warn");
             }
-            statusCell.appendChild(chip);
 
-            tr.appendChild(dateCell);
-            tr.appendChild(subjectCell);
-            tr.appendChild(statusCell);
-            recentBody.appendChild(tr);
+            statusSpan.appendChild(dot);
+            statusSpan.appendChild(
+              document.createTextNode(
+                " " +
+                  (pct ? pct.toFixed(1) + "%" : "--")
+              )
+            );
+
+            tr.innerHTML = `
+              <td>${row.subject_name || row.subject || ""}</td>
+              <td>${row.attended ?? ""}</td>
+              <td>${row.total ?? ""}</td>
+              <td></td>
+            `;
+            tr.children[3].appendChild(statusSpan);
+            attendanceBody.appendChild(tr);
           });
         } catch (err) {
           console.error(err);
-          metaLine.textContent = `Roll: ${roll} · Failed to load data`;
-          document.getElementById("overall-att").textContent = "--";
-          const pill = document.getElementById("attendance-pill");
-          pill.textContent = "Error loading";
-          pill.classList.remove("success");
-          pill.classList.add("warn");
+          attendanceError.style.display = "block";
+          attendanceError.textContent =
+            "Could not load attendance. Please try again.";
         }
       }
 
-      // Avatar click: open full photo
-      document.getElementById("avatar").addEventListener("click", () => {
-        if (currentPhotoUrl) {
-          window.open(currentPhotoUrl, "_blank");
-        } else {
-          alert("No photo available for this student yet.");
+      async function fetchUpcoming() {
+        try {
+          const res = await fetch(
+            `/api/student/upcoming?roll=${encodeURIComponent(roll)}`
+          );
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Failed to load timetable");
+          }
+
+          const list = data.upcoming || [];
+          if (!list.length) {
+            upcomingList.innerHTML =
+              '<div class="upcoming-item" style="color:#9ca3af">No upcoming classes in the next 24 hours.</div>';
+            return;
+          }
+
+          upcomingList.innerHTML = "";
+          list.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "upcoming-item";
+            div.innerHTML = `
+              <div class="upcoming-item-main">
+                <div>
+                  <div class="upcoming-item-title">${item.subject}</div>
+                  <div class="upcoming-item-meta">
+                    ${item.time_label || ""} · ${item.room || ""}
+                  </div>
+                </div>
+                <div class="pill-soft">${item.type || "Lecture"}</div>
+              </div>
+              <div class="upcoming-item-badges">
+                <span class="pill-soft">${item.faculty || "Faculty TBD"}</span>
+                ${
+                  item.note
+                    ? `<span class="pill-soft">${item.note}</span>`
+                    : ""
+                }
+              </div>
+            `;
+            upcomingList.appendChild(div);
+          });
+        } catch (err) {
+          console.error(err);
+          upcomingList.innerHTML =
+            '<div class="upcoming-item" style="color:#9ca3af">Could not load upcoming classes.</div>';
+        }
+      }
+
+      tabToday.addEventListener("click", () => {
+        tabToday.classList.add("tab--active");
+        tabWeek.classList.remove("tab--active");
+        tabMonth.classList.remove("tab--active");
+        tabToday
+          .querySelector(".tab-dot")
+          .classList.add("tab-dot--active");
+        tabWeek
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        tabMonth
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        fetchAttendanceView("today");
+      });
+
+      tabWeek.addEventListener("click", () => {
+        tabWeek.classList.add("tab--active");
+        tabToday.classList.remove("tab--active");
+        tabMonth.classList.remove("tab--active");
+        tabWeek
+          .querySelector(".tab-dot")
+          .classList.add("tab-dot--active");
+        tabToday
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        tabMonth
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        fetchAttendanceView("week");
+      });
+
+      tabMonth.addEventListener("click", () => {
+        tabMonth.classList.add("tab--active");
+        tabToday.classList.remove("tab--active");
+        tabWeek.classList.remove("tab--active");
+        tabMonth
+          .querySelector(".tab-dot")
+          .classList.add("tab-dot--active");
+        tabToday
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        tabWeek
+          .querySelector(".tab-dot")
+          .classList.remove("tab-dot--active");
+        fetchAttendanceView("month");
+      });
+
+      uploadPhotoBtn.addEventListener("click", () => {
+        const url = prompt(
+          "Paste a direct image URL for your profile photo for now."
+        );
+        if (!url) return;
+        photoPreview.src = url;
+        photoPreview.style.display = "block";
+        photoFallback.style.display = "none";
+        photoPreview.dataset.pendingUrl = url;
+
+        userAvatarPhoto.src = url;
+        userAvatarPhoto.style.display = "block";
+        userAvatarInitials.style.display = "none";
+      });
+
+      savePhotoBtn.addEventListener("click", async () => {
+        const pendingUrl = photoPreview.dataset.pendingUrl;
+        if (!pendingUrl) {
+          alert("Upload a photo URL first.");
+          return;
+        }
+        try {
+          savePhotoBtn.disabled = true;
+          savePhotoBtn.textContent = "Saving...";
+          const res = await fetch(
+            `/api/student/photo?roll=${encodeURIComponent(roll)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ photo_url: pendingUrl }),
+            }
+          );
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Failed to save photo");
+          }
+          alert("Profile photo updated.");
+          delete photoPreview.dataset.pendingUrl;
+
+          userAvatarPhoto.src = pendingUrl;
+          userAvatarPhoto.style.display = "block";
+          userAvatarInitials.style.display = "none";
+        } catch (err) {
+          console.error(err);
+          alert("Could not save photo. Please try again.");
+        } finally {
+          savePhotoBtn.disabled = false;
+          savePhotoBtn.textContent = "Save photo";
         }
       });
 
-      // Photo upload logic (option 1)
-      const photoInput = document.getElementById("photo-input");
-      const photoPreview = document.getElementById("photo-preview");
-      const savePhotoBtn = document.getElementById("save-photo-btn");
+      if (userAvatarButton) {
+        userAvatarButton.addEventListener("click", () => {
+          const url =
+            userAvatarPhoto.style.display === "block"
+              ? userAvatarPhoto.src
+              : photoPreview.style.display === "block"
+              ? photoPreview.src
+              : null;
 
-      if (photoInput && photoPreview && savePhotoBtn) {
-        photoInput.addEventListener("change", () => {
-          const file = photoInput.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            currentPhotoBase64 = e.target.result; // data:image/...;base64,...
-            photoPreview.src = currentPhotoBase64;
-
-            // Also update top-right avatar preview immediately
-            const avatarImg = document.getElementById("avatar-img");
-            const avatarInitial = document.getElementById("avatar-initial");
-            if (avatarImg && avatarInitial) {
-              avatarImg.src = currentPhotoBase64;
-              avatarImg.style.display = "block";
-              avatarInitial.style.display = "none";
-            }
-          };
-          reader.readAsDataURL(file);
+          if (!url) return;
+          window.open(url, "_blank", "noopener,noreferrer");
         });
+      }
 
-        savePhotoBtn.addEventListener("click", async () => {
-          const roll = getRollFromUrl();
-          if (!roll) {
-            alert("Missing student roll in URL.");
-            return;
-          }
-          if (!currentPhotoBase64) {
-            alert("Please choose a photo first.");
-            return;
-          }
-
+      if (enrollFaceBtn) {
+        enrollFaceBtn.addEventListener("click", async () => {
           try {
-            const res = await fetch(
-              `/api/students/${encodeURIComponent(roll)}/photo`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ photoUrl: currentPhotoBase64 }),
-              }
+            enrollFaceStatus.textContent = "";
+            const faceToken = prompt(
+              "Enter a secret phrase for face login demo. Remember this!"
             );
-
-            if (!res.ok) {
-              const data = await res.json().catch(() => ({}));
-              alert(data.error || "Failed to save photo.");
+            if (!faceToken) {
+              enrollFaceStatus.textContent = "Face login enrollment cancelled.";
               return;
             }
 
-            currentPhotoUrl = currentPhotoBase64;
-            alert("Profile photo saved.");
+            const res = await fetch(
+              `/api/students/${encodeURIComponent(
+                roll
+              )}/face-enroll`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ face_token: faceToken }),
+              }
+            );
+            const data = await res.json();
+            if (!res.ok || !data.ok) {
+              throw new Error(data.error || "Failed to enroll face");
+            }
+            enrollFaceStatus.textContent =
+              "Face login demo enrolled. Use this phrase on the login page.";
           } catch (err) {
             console.error(err);
-            alert("Failed to save photo (network or server error).");
+            enrollFaceStatus.textContent =
+              "Could not enroll face login. Please try again.";
           }
         });
       }
 
-      loadStudentDashboard();
+      if (saveProfileBtn) {
+        saveProfileBtn.addEventListener("click", async () => {
+          try {
+            saveProfileStatus.textContent = "";
+            const usn = studentUsnInput.value.trim();
+            const semester = studentSemesterInput.value.trim();
+
+            if (!usn || !semester) {
+              saveProfileStatus.textContent =
+                "USN and semester are required.";
+              return;
+            }
+
+            saveProfileBtn.disabled = true;
+            saveProfileStatus.textContent = "Saving...";
+
+            const res = await fetch("/api/student/profile", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ usn, semester }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) {
+              throw new Error(data.error || "Failed to save profile");
+            }
+            saveProfileStatus.textContent = "Saved.";
+          } catch (err) {
+            console.error(err);
+            saveProfileStatus.textContent =
+              "Could not save profile. Please try again.";
+          } finally {
+            saveProfileBtn.disabled = false;
+          }
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+          try {
+            await fetch("/auth/logout", { method: "POST" });
+          } catch (err) {
+            console.error(err);
+          }
+          window.location.href = "/login";
+        });
+      }
+
+      fetchStudentProfile();
+      fetchStudentMetrics();
+      fetchAttendanceView("today");
+      fetchUpcoming();
     </script>
   </body>
 </html>
