@@ -1,775 +1,1172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SmartTrack AI – Smart Attendance for Modern Classrooms</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --bg: #050816;
-      --card: #0b1020;
-      --accent: #6366f1;
-      --accent-soft: rgba(99, 102, 241, 0.12);
-      --accent-2: #22c55e;
-      --text: #f9fafb;
-      --muted: #9ca3af;
-      --border: #1f2937;
-      --danger: #ef4444;
-      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.85);
-      --radius-xl: 18px;
-      --radius-full: 999px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .page {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 24px 20px 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    /* Header */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      background: conic-gradient(from 210deg, #4f46e5, #22c55e, #06b6d4, #4f46e5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 14px 30px rgba(88, 80, 236, 0.7);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .brand-logo-inner {
-      width: 23px;
-      height: 23px;
-      border-radius: 9px;
-      background: radial-gradient(circle at 20% 0%, #e5e7eb 0, #0f172a 52%, #020617 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #e5e7eb;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .brand-text-title {
-      font-size: 18px;
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .brand-text-sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pill {
-      padding: 6px 11px;
-      border-radius: var(--radius-full);
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 0%, #4ade80 0, #16a34a 60%, #15803d 100%);
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
-    }
-
-    .btn-ghost {
-      padding: 7px 14px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      background: rgba(15, 23, 42, 0.85);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .btn-ghost span {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    .btn-ghost:hover {
-      border-color: rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.95);
-      transform: translateY(-0.5px);
-    }
-
-    /* Main layout */
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
-      gap: 32px;
-      align-items: center;
-    }
-
-    @media (max-width: 840px) {
-      .hero {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    /* Left hero */
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 10px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(148, 163, 184, 0.28);
-      background: radial-gradient(circle at 0 0, #4f46e5 0, rgba(15, 23, 42, 0.0) 45%),
-                  rgba(15, 23, 42, 0.85);
-      color: #e5e7eb;
-      font-size: 11px;
-      margin-bottom: 14px;
-    }
-
-    .eyebrow-label {
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .headline {
-      font-size: clamp(28px, 4vw, 36px);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      margin-bottom: 10px;
-    }
-
-    .headline-gradient {
-      background: linear-gradient(120deg, #e5e7eb, #a5b4fc, #22c55e);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .headline span {
-      display: inline-block;
-    }
-
-    .subtext {
-      font-size: 13px;
-      color: var(--muted);
-      max-width: 420px;
-      line-height: 1.6;
-      margin-bottom: 18px;
-    }
-
-    .hero-metrics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .metric {
-      padding: 7px 11px;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      font-size: 11px;
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .metric strong {
-      font-size: 13px;
-      color: #e5e7eb;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .btn-primary {
-      padding: 10px 18px;
-      border-radius: var(--radius-full);
-      border: none;
-      cursor: pointer;
-      background: linear-gradient(135deg, #4f46e5, #22c55e);
-      color: #f9fafb;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 18px 35px rgba(79, 70, 229, 0.55);
-      transition: all 0.15s ease;
-    }
-
-    .btn-primary span {
-      font-size: 16px;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 22px 45px rgba(79, 70, 229, 0.8);
-    }
-
-    .btn-secondary {
-      padding: 9px 14px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-secondary span {
-      font-size: 18px;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(15, 23, 42, 1);
-      border-color: rgba(148, 163, 184, 0.7);
-      transform: translateY(-0.5px);
-    }
-
-    .hero-footnote {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* Right hero (card) */
-    .hero-card {
-      background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.3) 0, rgba(15, 23, 42, 0.08) 42%),
-                  radial-gradient(circle at 100% 0, rgba(129, 140, 248, 0.28) 0, rgba(15, 23, 42, 0.08) 48%),
-                  #020617;
-      border-radius: 28px;
-      padding: 16px 16px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.28);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .hero-card-tabs {
-      display: inline-flex;
-      padding: 3px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      gap: 3px;
-    }
-
-    .hero-card-tab {
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      color: var(--muted);
-      cursor: default;
-      white-space: nowrap;
-    }
-
-    .hero-card-tab.active {
-      background: rgba(15, 23, 42, 0.95);
-      color: #e5e7eb;
-      border: 1px solid rgba(148, 163, 184, 0.9);
-    }
-
-    .hero-card-badge {
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 10px;
-      background: rgba(34, 197, 94, 0.14);
-      border: 1px solid rgba(34, 197, 94, 0.5);
-      color: #bbf7d0;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .hero-card-main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.1fr);
-      gap: 12px;
-      align-items: stretch;
-    }
-
-    @media (max-width: 768px) {
-      .hero-card-main {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .hero-roster {
-      background: rgba(15, 23, 42, 0.94);
-      border-radius: 18px;
-      padding: 10px 10px 8px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-roster-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .hero-roster-title {
-      font-size: 12px;
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .hero-roster-sub {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .hero-roster-tag {
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      color: #a5b4fc;
-      background: rgba(79, 70, 229, 0.14);
-      border: 1px solid rgba(79, 70, 229, 0.7);
-    }
-
-    .hero-roster-list {
-      margin-top: 4px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(31, 41, 55, 0.85);
-      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.28) 0, rgba(15, 23, 42, 0.9) 48%);
-    }
-
-    .hero-roster-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1.4fr;
-      padding: 7px 10px;
-      font-size: 11px;
-      align-items: center;
-      color: #e5e7eb;
-    }
-
-    .hero-roster-row:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.85);
-    }
-
-    .hero-roster-row:nth-child(even) {
-      background: rgba(15, 23, 42, 0.95);
-    }
-
-    .hero-roster-row span.status-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-present {
-      background: rgba(34, 197, 94, 0.14);
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.55);
-    }
-
-    .status-absent {
-      background: rgba(248, 113, 113, 0.12);
-      color: #fecaca;
-      border: 1px solid rgba(248, 113, 113, 0.55);
-    }
-
-    .status-late {
-      background: rgba(251, 191, 36, 0.14);
-      color: #fef3c7;
-      border: 1px solid rgba(251, 191, 36, 0.6);
-    }
-
-    .hero-roster-foot {
-      margin-top: 7px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .hero-roster-foot strong {
-      color: #e5e7eb;
-    }
-
-    /* Side panel: insights */
-    .hero-insights {
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 18px;
-      padding: 10px 10px 9px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .hero-insights-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .hero-insights-header-title {
-      font-size: 12px;
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-
-    .hero-insights-header-sub {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .hero-insights-chip {
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      background: rgba(39, 39, 42, 0.8);
-      border: 1px solid rgba(82, 82, 91, 0.9);
-      color: #e5e7eb;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .hero-insights-metrics {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .hero-insights-box {
-      padding: 8px 9px;
-      border-radius: 14px;
-      background: radial-gradient(circle at 0 0, rgba(249, 115, 22, 0.3) 0, rgba(24, 24, 27, 0.96) 55%);
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      font-size: 11px;
-      color: #e5e7eb;
-    }
-
-    .hero-insights-box:nth-child(2) {
-      background: radial-gradient(circle at 100% 0, rgba(59, 130, 246, 0.32) 0, rgba(24, 24, 27, 0.96) 55%);
-    }
-
-    .hero-insights-label {
-      font-size: 10px;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .hero-insights-value {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-
-    .hero-insights-trend {
-      font-size: 10px;
-      color: #bbf7d0;
-    }
-
-    .hero-insights-footer {
-      margin-top: 4px;
-      padding: 7px 8px;
-      border-radius: 12px;
-      background: rgba(17, 24, 39, 0.92);
-      border: 1px dashed rgba(55, 65, 81, 0.9);
-      font-size: 10px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .hero-insights-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 0, #22c55e 0, #16a34a 60%, #15803d 100%);
-    }
-
-    /* Footer */
-    .footer {
-      margin-top: 8px;
-      font-size: 10px;
-      color: #6b7280;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTrack AI - Intelligent Attendance Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --accent: #00FF88;
+            --bg-dark: #0A0E27;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --gradient-1: linear-gradient(135deg, #0066FF 0%, #00FF88 100%);
+            --gradient-2: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.15) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 39, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 1rem 5%;
+            background: rgba(10, 14, 39, 0.95);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-cta {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 5% 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #00FF88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 102, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 102, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .trust-line {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.2);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 6rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Problem Section */
+        .problem {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
+            border-radius: 30px;
+            padding: 4rem;
+        }
+
+        .problem-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .problem-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .problem-item::before {
+            content: '❌';
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Solution Grid */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .solution-item {
+            text-align: center;
+        }
+
+        .solution-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .solution-item:nth-child(2) .solution-icon {
+            animation-delay: 0.5s;
+        }
+
+        .solution-item:nth-child(3) .solution-icon {
+            animation-delay: 1s;
+        }
+
+        .solution-item:nth-child(4) .solution-icon {
+            animation-delay: 1.5s;
+        }
+
+        .solution-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Benefits Section */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            background: var(--bg-card);
+            border-radius: 30px;
+            padding: 4rem;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-2);
+        }
+
+        .author-info strong {
+            display: block;
+            color: var(--text-primary);
+        }
+
+        .author-info span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 3rem;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(0, 102, 255, 0.1);
+            font-weight: 700;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .comparison-table td:last-child {
+            background: rgba(0, 255, 136, 0.05);
+            font-weight: 600;
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question:hover {
+            color: var(--accent);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Stats Counter */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .stat-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* How It Works */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            background: var(--gradient-2);
+            border-radius: 30px;
+            padding: 5rem 3rem;
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .final-cta p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 6rem 5% 3rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+
+            .trust-line {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            section {
+                padding: 3rem 5%;
+            }
+
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 1rem 0.5rem;
+            }
+
+            .final-cta {
+                padding: 3rem 1.5rem;
+            }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Particle Animation */
+        .particle {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            animation: particleFloat 3s ease-out forwards;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="page">
-    <!-- Header -->
-    <header class="header">
-      <div class="brand">
-        <div class="brand-logo">
-          <div class="brand-logo-inner">ST</div>
-        </div>
-        <div>
-          <div class="brand-text-title">SmartTrack AI</div>
-          <div class="brand-text-sub">Smart attendance for modern classrooms</div>
-        </div>
-      </div>
-      <div class="header-actions">
-        <div class="pill">
-          <span class="pill-dot"></span>
-          Live demo · Teacher view
-        </div>
-        <a href="/login" class="btn-ghost">
-          Login
-          <span>→</span>
-        </a>
-      </div>
-    </header>
+    <div class="bg-animation"></div>
 
-    <!-- Hero -->
-    <main class="hero">
-      <!-- Left: copy -->
-      <section>
-        <div class="eyebrow">
-          <span class="eyebrow-label">AI‑assisted attendance</span>
-          <span>Built for campus workflows like yours</span>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="logo">SmartTrack AI</div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#testimonials">Reviews</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+        </ul>
+        <a href="login.html" class="nav-cta">Start Free Trial</a>
+        <button class="mobile-menu-btn">☰</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Stop Wasting Hours on Outdated Attendance Sheets</h1>
+            <p class="hero-subtitle">
+                SmartTrack AI automates roll call, tracks trends, and gives you back <strong>5+ hours every week</strong> — so you can focus on teaching, not paperwork.
+            </p>
+            <div class="hero-cta">
+                <a href="teacher.html" class="btn-primary">Watch 60-Second Demo</a>
+                <a href="login.html" class="btn-secondary">Start Free Trial — No Credit Card</a>
+            </div>
+            <div class="trust-line">
+                <span class="trust-item">✅ Used by 50+ classrooms</span>
+                <span class="trust-item">🔒 Bank-Level Security</span>
+                <span class="trust-item">📊 10,000+ Sessions Tracked</span>
+            </div>
         </div>
+    </section>
 
-        <h1 class="headline">
-          <span>Turn messy</span><br>
-          <span class="headline-gradient">attendance into live insights.</span>
-        </h1>
+    <!-- Problem Section -->
+    <section>
+        <div class="problem glass-card">
+            <div class="section-header">
+                <h2>Are Paper Registers Killing Your Productivity?</h2>
+                <p>Every day, teachers waste precious class time on repetitive tasks</p>
+            </div>
+            <div class="problem-list">
+                <div class="problem-item">
+                    <div>
+                        <strong>Calling out 40+ names one by one</strong>
+                        <p>10-15 minutes lost every single class</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div>
+                        <strong>Deciphering messy handwriting</strong>
+                        <p>Confusion over who was actually present</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div>
+                        <strong>Losing attendance sheets</strong>
+                        <p>Having to recreate records from memory</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div>
+                        <strong>Manual percentage calculations</strong>
+                        <p>Hours wasted at month-end reports</p>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; text-align: center; font-size: 1.2rem; color: var(--accent);">
+                <strong>Meanwhile, students slip through the cracks.</strong><br>
+                A student fails due to low attendance, but the warning comes too late.
+            </p>
+        </div>
+    </section>
 
-        <p class="subtext">
-          SmartTrack AI replaces paper registers with a live, section‑wise dashboard. Teachers get one‑click snapshots, students get clear history, and your data stays organized.
+    <!-- Solution Section -->
+    <section id="features">
+        <div class="section-header">
+            <h2>Mark Attendance in 10 Clicks. Get Instant Insights.</h2>
+            <p>SmartTrack AI replaces your entire attendance workflow</p>
+        </div>
+        <div class="solution-grid">
+            <div class="glass-card solution-item">
+                <div class="solution-icon">📋</div>
+                <h3>Pre-loaded Class Lists</h3>
+                <p>No manual entry. Import from Excel or add students in 2 minutes.</p>
+            </div>
+            <div class="glass-card solution-item">
+                <div class="solution-icon">⚡</div>
+                <h3>One-Tap Marking</h3>
+                <p>Present, Absent, or Late. Mark entire classes in under 30 seconds.</p>
+            </div>
+            <div class="glass-card solution-item">
+                <div class="solution-icon">📊</div>
+                <h3>Auto-Calculated Stats</h3>
+                <p>See who's at risk instantly. AI flags students below 75% automatically.</p>
+            </div>
+            <div class="glass-card solution-item">
+                <div class="solution-icon">☁️</div>
+                <h3>Cloud-Synced Records</h3>
+                <p>Never lose data again. Access from any device, anywhere.</p>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 3rem; font-size: 1.2rem;">
+            <strong>Better yet?</strong> Students can track their own attendance in real-time — no more "I didn't know I was failing" excuses.
         </p>
+    </section>
 
-        <div class="hero-metrics">
-          <div class="metric">
-            <strong>2 views</strong>
-            <span>teacher + student dashboards</span>
-          </div>
-          <div class="metric">
-            <strong>Face‑ready</strong>
-            <span>profile photos stored per student</span>
-          </div>
-          <div class="metric">
-            <strong>Zero Excel</strong>
-            <span>all sections in one place</span>
-          </div>
+    <!-- Stats -->
+    <section>
+        <div class="stats">
+            <div>
+                <div class="stat-number" data-target="5">0</div>
+                <div class="stat-label">Hours Saved Per Week</div>
+            </div>
+            <div>
+                <div class="stat-number" data-target="50">0</div>
+                <div class="stat-label">Active Classrooms</div>
+            </div>
+            <div>
+                <div class="stat-number" data-target="10000">0</div>
+                <div class="stat-label">Sessions Tracked</div>
+            </div>
+            <div>
+                <div class="stat-number" data-target="99">0</div>
+                <div class="stat-label">% Uptime</div>
+            </div>
         </div>
+    </section>
 
-        <div class="hero-actions">
-          <a href="/login" class="btn-primary">
-            Get started · Login
-            <span>↗</span>
-          </a>
-          <a href="/teacher" class="btn-secondary">
-            Open teacher demo
-            <span>▢</span>
-          </a>
+    <!-- Benefits Grid -->
+    <section>
+        <div class="section-header">
+            <h2>Everything You Need to Reclaim Your Time</h2>
         </div>
-
-        <p class="hero-footnote">
-          No auth wired yet – login/teacher routes are demo‑ready so you can plug in real signup and face identity later.
-        </p>
-      </section>
-
-      <!-- Right: visual card -->
-      <aside class="hero-card">
-        <div class="hero-card-header">
-          <div class="hero-card-tabs">
-            <div class="hero-card-tab active">Teacher snapshot</div>
-            <div class="hero-card-tab">Student profile</div>
-          </div>
-          <div class="hero-card-badge">
-            <span>●</span>
-            Live section: AIML‑C
-          </div>
+        <div class="benefits-grid">
+            <div class="glass-card">
+                <h3>🕒 Save 5+ Hours/Week</h3>
+                <p>Automate roll call. Export reports in seconds. Spend time on what actually matters — teaching.</p>
+            </div>
+            <div class="glass-card">
+                <h3>📊 Spot Trends Early</h3>
+                <p>AI flags students dropping below 75% before it's too late. Intervene proactively, not reactively.</p>
+            </div>
+            <div class="glass-card">
+                <h3>🔒 Military-Grade Security</h3>
+                <p>256-bit encryption. GDPR compliant. Your data, your control. Even we can't see it without your login.</p>
+            </div>
+            <div class="glass-card">
+                <h3>📱 Works Everywhere</h3>
+                <p>Desktop, tablet, or phone. Online or offline sync. No app download required.</p>
+            </div>
+            <div class="glass-card">
+                <h3>📈 Instant Analytics</h3>
+                <p>See class-wide patterns. Which days have highest absenteeism? Which students are struggling?</p>
+            </div>
+            <div class="glass-card">
+                <h3>🎯 Student Transparency</h3>
+                <p>Students log in to see their own attendance. No more "check with me after class" confusion.</p>
+            </div>
         </div>
+    </section>
 
-        <div class="hero-card-main">
-          <!-- Roster -->
-          <div class="hero-roster">
-            <div class="hero-roster-header">
-              <div>
-                <div class="hero-roster-title">Today · Python Lab</div>
-                <div class="hero-roster-sub">Section AIML‑C · 24 Jan 2026</div>
-              </div>
-              <div class="hero-roster-tag">Quick save snapshot</div>
+    <!-- Testimonials -->
+    <section id="testimonials">
+        <div class="testimonials">
+            <div class="section-header">
+                <h2>Why 50+ Teachers Switched to SmartTrack AI</h2>
             </div>
-
-            <div class="hero-roster-list">
-              <div class="hero-roster-row">
-                <span>20 · Detroit</span>
-                <span>Face match</span>
-                <span class="status-pill status-present">Present · 09:01</span>
-              </div>
-              <div class="hero-roster-row">
-                <span>21 · Sana</span>
-                <span>Manual override</span>
-                <span class="status-pill status-absent">Absent</span>
-              </div>
-              <div class="hero-roster-row">
-                <span>22 · Rahul</span>
-                <span>Face match</span>
-                <span class="status-pill status-late">Late · 09:07</span>
-              </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I used to dread attendance. Now it's the easiest part of my day. I just tap a few buttons and I'm done."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <strong>Ms. Anjali Rao</strong>
+                            <span>Computer Science Dept., RVCE</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Our admin loves the auto-generated reports. Saves us hours every semester. Best investment we made this year."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <strong>Mr. Karthik Menon</strong>
+                            <span>HOD, Bangalore Institute of Technology</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Students finally have transparency. No more 'check with me after class' confusion. They can see their stats anytime."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <strong>Dr. Priya Sharma</strong>
+                            <span>Assistant Professor, AIML Dept.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="hero-roster-foot">
-              <span><strong>18/24</strong> marked · synced to history</span>
-              <span>Tap to drill into per‑student details →</span>
-            </div>
-          </div>
-
-          <!-- Insights -->
-          <div class="hero-insights">
-            <div class="hero-insights-header">
-              <div>
-                <div class="hero-insights-header-title">Section health</div>
-                <div class="hero-insights-header-sub">Today vs last 7 days</div>
-              </div>
-              <div class="hero-insights-chip">
-                <span>⚡</span>
-                AI‑ready signals
-              </div>
-            </div>
-
-            <div class="hero-insights-metrics">
-              <div class="hero-insights-box">
-                <div class="hero-insights-label">Overall attendance</div>
-                <div class="hero-insights-value">88%</div>
-                <div class="hero-insights-trend">+6% vs last week</div>
-              </div>
-              <div class="hero-insights-box">
-                <div class="hero-insights-label">Chronic absentees</div>
-                <div class="hero-insights-value">3 students</div>
-                <div class="hero-insights-trend">Flagged for follow‑up</div>
-              </div>
-            </div>
-
-            <div class="hero-insights-footer">
-              <span class="hero-insights-dot"></span>
-              <span>Every mark is stored against the student, so profiles can show history and photo identity in one place.</span>
-            </div>
-          </div>
         </div>
-      </aside>
-    </main>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="pricing">
+        <div class="section-header">
+            <h2>See How SmartTrack Stacks Up</h2>
+        </div>
+        <table class="comparison-table glass-card">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Paper Registers</th>
+                    <th>Google Sheets</th>
+                    <th>SmartTrack AI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Speed</strong></td>
+                    <td>❌ 10-15 min/class</td>
+                    <td>⚠️ 5 min/class</td>
+                    <td>✅ 30 seconds</td>
+                </tr>
+                <tr>
+                    <td><strong>Auto-Calculations</strong></td>
+                    <td>❌ Manual</td>
+                    <td>⚠️ Formula errors</td>
+                    <td>✅ Instant AI</td>
+                </tr>
+                <tr>
+                    <td><strong>Student Access</strong></td>
+                    <td>❌ None</td>
+                    <td>❌ None</td>
+                    <td>✅ Real-time portal</td>
+                </tr>
+                <tr>
+                    <td><strong>Lost Data Risk</strong></td>
+                    <td>❌ High</td>
+                    <td>⚠️ Medium</td>
+                    <td>✅ Cloud backup</td>
+                </tr>
+                <tr>
+                    <td><strong>Mobile-Friendly</strong></td>
+                    <td>❌ No</td>
+                    <td>⚠️ Clunky</td>
+                    <td>✅ Optimized</td>
+                </tr>
+                <tr>
+                    <td><strong>Price</strong></td>
+                    <td>Free (but your time isn't)</td>
+                    <td>Free</td>
+                    <td><strong>Free for 1 class</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works">
+        <div class="section-header">
+            <h2>Get Started in 3 Simple Steps</h2>
+        </div>
+        <div class="steps">
+            <div class="step glass-card">
+                <div class="step-number">1</div>
+                <h3>Import Your Class List</h3>
+                <p>Upload from Excel or add students manually in 2 minutes. Supports sections, roll numbers, and photos.</p>
+            </div>
+            <div class="step glass-card">
+                <div class="step-number">2</div>
+                <h3>Mark Attendance with One Tap</h3>
+                <p>Present, Absent, or Late. Mark entire class rosters in under 30 seconds. Works offline too.</p>
+            </div>
+            <div class="step glass-card">
+                <div class="step-number">3</div>
+                <h3>Let AI Do the Rest</h3>
+                <p>Automatic reports, trend analysis, risk alerts. Export to Excel/PDF with one click.</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="teacher.html" class="btn-primary">Watch 60-Second Walkthrough →</a>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+        <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Is my data secure?</span>
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Yes.</strong> We use 256-bit encryption + secure cookies. Even we can't see your raw data without your login. All data is stored with industry-standard security protocols.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What if the internet goes down mid-class?</span>
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Offline mode.</strong> Mark attendance without internet. Data syncs automatically when you're back online. Nothing gets lost.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Can I export reports for my HOD/Principal?</span>
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Absolutely.</strong> One-click export to Excel, PDF, or CSV. Includes student names, attendance percentages, trend analysis, and custom date ranges.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How much does it cost?</span>
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Free for one class.</strong> Unlimited classes = ₹499/month ($6/month). No hidden fees. Cancel anytime with one click.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What if I don't like it?</span>
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>7-day free trial. Cancel anytime.</strong> No questions asked. No contracts. You're in full control.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section>
+        <div class="final-cta">
+            <h2>Ready to Reclaim Your Time?</h2>
+            <p>Join 50+ teachers who stopped drowning in paperwork</p>
+            <div class="hero-cta">
+                <a href="login.html" class="btn-primary">Start Free Trial</a>
+                <a href="teacher.html" class="btn-secondary">Book a Live Demo</a>
+            </div>
+            <div class="trust-line" style="margin-top: 2rem;">
+                <span class="trust-item">✅ No credit card</span>
+                <span class="trust-item">✅ Setup in 5 minutes</span>
+                <span class="trust-item">✅ Cancel anytime</span>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="footer">
-      <span>SmartTrack AI · Demo build · AIML project</span>
-      <div class="footer-links">
-        <a href="/teacher">Teacher view</a>
-        <a href="/login">Login</a>
-      </div>
+    <footer>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Documentation</a>
+        </div>
+        <p style="color: var(--text-secondary);">
+            © 2024 SmartTrack AI · Demo build · AIML project
+        </p>
     </footer>
-  </div>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                const isActive = faqItem.classList.contains('active');
+
+                // Close all FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Stats Counter Animation
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const target = parseInt(stat.getAttribute('data-target'));
+                        animateCounter(stat, 0, target, 2000);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            observer.observe(statsSection.parentElement);
+        }
+
+        function animateCounter(element, start, end, duration) {
+            let startTime = null;
+
+            const step = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+
+                if (end > 1000) {
+                    element.textContent = current.toLocaleString() + '+';
+                } else {
+                    element.textContent = current + (end === 99 ? '.9%' : '');
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+
+            window.requestAnimationFrame(step);
+        }
+
+        // Button Ripple Effect
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const particle = document.createElement('span');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.width = '10px';
+                particle.style.height = '10px';
+
+                button.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 3000);
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

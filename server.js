@@ -22,7 +22,9 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve static assets from /public
+// Serve static assets (CSS, JS, etc.) from the root and public folders
+// This allows the server to find "login.html" when the browser asks for it directly.
+app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ---------- Auth helpers ----------
@@ -100,20 +102,21 @@ function ensureDemoUsers() {
 ensureDemoUsers();
 
 // ---------- Public pages ----------
+// We support both clean routes (/login) and file routes (/login.html)
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "landing.html"));
 });
 
-app.get("/login", (req, res) => {
+app.get(["/login", "/login.html"], (req, res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
-app.get("/teacher", (req, res) => {
+app.get(["/teacher", "/teacher.html"], (req, res) => {
   res.sendFile(path.join(__dirname, "teacher.html"));
 });
 
-app.get("/student", (req, res) => {
+app.get(["/student", "/student.html"], (req, res) => {
   res.sendFile(path.join(__dirname, "student.html"));
 });
 
@@ -162,9 +165,9 @@ app.post("/auth/login", async (req, res) => {
 
     setAuthCookie(res, token);
 
-    let redirect = "/";
+    let redirect = "landing.html";
     if (user.role === "teacher") {
-      redirect = "/teacher";
+      redirect = "teacher.html";
     } else if (user.role === "student") {
       if (!user.roll_number) {
         return res.status(500).json({
@@ -172,7 +175,7 @@ app.post("/auth/login", async (req, res) => {
           message: "Student user has no linked roll_number",
         });
       }
-      redirect = `/student?roll=${encodeURIComponent(user.roll_number)}`;
+      redirect = `student.html?roll=${encodeURIComponent(user.roll_number)}`;
     }
 
     return res.json({
@@ -263,7 +266,7 @@ app.post("/auth/face-login", async (req, res) => {
       ok: true,
       token,
       roll: student.roll_number,
-      redirect: `/student?roll=${encodeURIComponent(student.roll_number)}`,
+      redirect: `student.html?roll=${encodeURIComponent(student.roll_number)}`,
     });
   } catch (err) {
     console.error(err);
