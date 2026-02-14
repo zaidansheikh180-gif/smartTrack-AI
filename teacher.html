@@ -597,11 +597,11 @@
           <span class="pill-dot"></span>
           Current session not yet saved
         </div>
-        <a href="/" class="btn-ghost">
+        <a href="landing.html" class="btn-ghost">
           Landing
           <span>↗</span>
         </a>
-        <a href="/login" class="btn-ghost">
+        <a href="login.html" class="btn-ghost">
           Login
           <span>→</span>
         </a>
@@ -832,8 +832,8 @@
     <footer class="footer">
       <span>SmartTrack AI · Teacher view · Uses the same /api endpoints you wired in server.js.</span>
       <span>
-        <a href="/">Landing</a> ·
-        <a href="/login">Login</a>
+        <a href="landing.html">Landing</a> ·
+        <a href="login.html">Login</a>
       </span>
     </footer>
   </div>
@@ -1107,7 +1107,7 @@
 
             viewBtn.addEventListener("click", () => {
               window.open(
-                `/student?roll=${encodeURIComponent(s.roll_number)}`,
+                `student.html?roll=${encodeURIComponent(s.roll_number)}`,
                 "_blank"
               );
             });

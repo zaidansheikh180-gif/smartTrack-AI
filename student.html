@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Student Dashboard - SmartTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- AI Face API Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
     <style>
       :root {
@@ -752,6 +754,60 @@
         font-size: 0.78rem;
         color: #9ca3af;
       }
+
+      /* Webcam Modal Styles */
+      .ai-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .ai-modal-content {
+        background: #020617;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 24px;
+        max-width: 500px;
+        width: 100%;
+        padding: 24px;
+        text-align: center;
+        position: relative;
+      }
+      .ai-video-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        margin: 16px 0;
+      }
+      #ai-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #ai-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .ai-loader {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 6, 23, 0.8);
+        color: #fff;
+        font-size: 0.9rem;
+      }
     </style>
   </head>
 
@@ -1039,7 +1095,7 @@
                       class="enroll-face-btn"
                     >
                       <span class="btn-icon">★</span>
-                      <span>Enroll face login demo</span>
+                      <span>Enroll Face ID (Real AI)</span>
                     </button>
                     <p
                       id="enroll-face-status"
@@ -1165,6 +1221,31 @@
       </main>
     </div>
 
+    <!-- AI Webcam Modal -->
+    <div id="ai-modal" class="ai-modal">
+      <div class="ai-modal-content">
+        <h3 id="ai-modal-title">Face ID Enrollment</h3>
+        <p id="ai-modal-sub" style="font-size: 0.8rem; color: #9ca3af; margin-top: 4px;">
+          Position your face in the center of the frame.
+        </p>
+
+        <div class="ai-video-container">
+          <video id="ai-video" autoplay muted playsinline></video>
+          <canvas id="ai-canvas"></canvas>
+          <div id="ai-loader" class="ai-loader">Initializing AI models...</div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button id="ai-capture-btn" class="btn btn-primary" disabled>
+            <span>Scan Face</span>
+          </button>
+          <button id="ai-close-btn" class="btn btn-ghost">
+            <span>Cancel</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
       const params = new URLSearchParams(window.location.search);
       const roll = params.get("roll");
@@ -1213,6 +1294,17 @@
       const saveProfileStatus =
         document.getElementById("save-profile-status");
 
+      // AI Elements
+      const aiModal = document.getElementById("ai-modal");
+      const aiVideo = document.getElementById("ai-video");
+      const aiCanvas = document.getElementById("ai-canvas");
+      const aiLoader = document.getElementById("ai-loader");
+      const aiCaptureBtn = document.getElementById("ai-capture-btn");
+      const aiCloseBtn = document.getElementById("ai-close-btn");
+
+      let modelsLoaded = false;
+      let stream = null;
+
       if (!roll) {
         if (attendanceError) {
           attendanceError.style.display = "block";
@@ -1250,7 +1342,7 @@
           studentSemesterInput.value = s.semester || "";
           studentSectionInput.value = s.section || "";
           studentEmailInput.value = s.email || "";
-          studentUsnInput.value = s.usn || s.registration_number || "";
+          studentUsnInput.value = s.usn || "";
 
           userNamePill.textContent = s.name
             ? `${s.name} · Student`
@@ -1274,11 +1366,6 @@
           }
         } catch (err) {
           console.error(err);
-          if (attendanceError) {
-            attendanceError.style.display = "block";
-            attendanceError.textContent =
-              "Could not load profile. Please try again later.";
-          }
         }
       }
 
@@ -1288,369 +1375,148 @@
             `/api/student/attendance/metrics?roll=${encodeURIComponent(roll)}`
           );
           const data = await res.json();
-          if (!res.ok || !data.ok) {
-            throw new Error(data.error || "Failed to load metrics");
-          }
+          if (!res.ok || !data.ok) return;
 
           const m = data.metrics;
+          overallAttendanceEl.textContent = m.overall_percentage.toFixed(1) + "%";
 
-          if (m.overall_percentage != null) {
-            overallAttendanceEl.textContent =
-              m.overall_percentage.toFixed(1) + "%";
-          } else {
-            overallAttendanceEl.textContent = "--";
-          }
-
-          const overall = m.overall_percentage || 0;
-          if (overall >= 85) {
+          if (m.overall_percentage >= 75) {
             overallAttendancePill.textContent = "On track";
-            overallAttendancePill.style.borderColor =
-              "rgba(34,197,94,0.9)";
-          } else if (overall >= 75) {
-            overallAttendancePill.textContent = "Watch list";
-            overallAttendancePill.style.borderColor =
-              "rgba(250,204,21,0.9)";
+            overallAttendancePill.className = "metric-pill";
           } else {
-            overallAttendancePill.textContent = "At risk";
-            overallAttendancePill.style.borderColor =
-              "rgba(248,113,113,0.9)";
+            overallAttendancePill.textContent = "Low";
+            overallAttendancePill.className = "metric-pill metric-pill-soft";
+            overallAttendancePill.style.color = "#ef4444";
           }
 
-          if (m.last_7_days_score != null) {
-            last7ScoreEl.textContent = m.last_7_days_score.toFixed(0) + "%";
-          } else {
-            last7ScoreEl.textContent = "--";
-          }
-          last7Pill.textContent = m.last_7_days_comment || "Recent trend";
-
-          if (m.risk_subject_count != null) {
-            riskCountEl.textContent = m.risk_subject_count;
-          } else {
-            riskCountEl.textContent = "--";
-          }
-          riskPill.textContent =
-            m.risk_summary || "Subjects close to shortage";
+          last7ScoreEl.textContent = m.last_7_days_score.toFixed(0) + "%";
+          last7Pill.textContent = m.last_7_days_comment;
+          riskCountEl.textContent = m.risk_subject_count;
+          riskPill.textContent = m.risk_summary;
         } catch (err) {
           console.error(err);
         }
       }
 
-      async function fetchAttendanceView(view) {
-        const param =
-          view === "week" ? "week" : view === "month" ? "month" : "today";
+      // --- AI Face Recognition Logic ---
+
+      async function loadAIModels() {
+        if (modelsLoaded) return;
+        aiLoader.style.display = "flex";
+        aiLoader.textContent = "Loading AI models (weights)...";
+
+        // Using models from a reliable source
+        const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+
+        await Promise.all([
+          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+
+        modelsLoaded = true;
+        aiLoader.style.display = "none";
+      }
+
+      async function startWebcam() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+          aiVideo.srcObject = stream;
+          aiCaptureBtn.disabled = false;
+        } catch (err) {
+          alert("Could not access webcam. Please check permissions.");
+          closeAIModal();
+        }
+      }
+
+      function stopWebcam() {
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          stream = null;
+        }
+      }
+
+      function closeAIModal() {
+        aiModal.style.display = "none";
+        stopWebcam();
+      }
+
+      enrollFaceBtn.addEventListener("click", async () => {
+        aiModal.style.display = "flex";
+        await loadAIModels();
+        await startWebcam();
+      });
+
+      aiCloseBtn.addEventListener("click", closeAIModal);
+
+      aiCaptureBtn.addEventListener("click", async () => {
+        aiCaptureBtn.disabled = true;
+        aiCaptureBtn.textContent = "Scanning...";
 
         try {
-          attendanceError.style.display = "none";
-          attendanceBody.innerHTML =
-            '<tr><td colspan="4" style="text-align:center;color:#6b7280">Loading attendance...</td></tr>';
+          const detection = await faceapi.detectSingleFace(aiVideo)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
 
-          const res = await fetch(
-            `/api/student/attendance?roll=${encodeURIComponent(
-              roll
-            )}&view=${encodeURIComponent(param)}`
-          );
-          const data = await res.json();
-          if (!res.ok || !data.ok) {
-            throw new Error(data.error || "Failed to load attendance");
-          }
-
-          const rows = data.attendance || [];
-          if (!rows.length) {
-            attendanceBody.innerHTML =
-              '<tr><td colspan="4" style="text-align:center;color:#6b7280">No attendance records for this view.</td></tr>';
+          if (!detection) {
+            alert("No face detected. Please ensure your face is visible and well-lit.");
+            aiCaptureBtn.disabled = false;
+            aiCaptureBtn.textContent = "Scan Face";
             return;
           }
 
-          attendanceBody.innerHTML = "";
-          rows.forEach((row) => {
-            const tr = document.createElement("tr");
-            const statusSpan = document.createElement("span");
-            statusSpan.className = "badge-attendance";
-            const dot = document.createElement("span");
-            dot.className = "badge-attendance-dot";
+          // Convert Float32Array to regular array for JSON storage
+          const descriptor = Array.from(detection.descriptor);
 
-            const pct =
-              row.percentage != null ? Number(row.percentage) : 0;
-            if (pct >= 85) {
-              dot.classList.add("badge-attendance-dot--good");
-            } else if (pct >= 75) {
-              dot.classList.add("badge-attendance-dot--warn");
-            }
-
-            statusSpan.appendChild(dot);
-            statusSpan.appendChild(
-              document.createTextNode(
-                " " +
-                  (pct ? pct.toFixed(1) + "%" : "--")
-              )
-            );
-
-            tr.innerHTML = `
-              <td>${row.subject_name || row.subject || ""}</td>
-              <td>${row.attended ?? ""}</td>
-              <td>${row.total ?? ""}</td>
-              <td></td>
-            `;
-            tr.children[3].appendChild(statusSpan);
-            attendanceBody.appendChild(tr);
+          const res = await fetch(`/api/students/${encodeURIComponent(roll)}/face-enroll`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ face_token: JSON.stringify(descriptor) }),
           });
+
+          if (res.ok) {
+            enrollFaceStatus.textContent = "Face ID enrolled successfully! You can now use Face Login.";
+            enrollFaceStatus.style.color = "#4ade80";
+            closeAIModal();
+          } else {
+            const data = await res.json();
+            alert(data.error || "Enrollment failed.");
+          }
         } catch (err) {
           console.error(err);
-          attendanceError.style.display = "block";
-          attendanceError.textContent =
-            "Could not load attendance. Please try again.";
-        }
-      }
-
-      async function fetchUpcoming() {
-        try {
-          const res = await fetch(
-            `/api/student/upcoming?roll=${encodeURIComponent(roll)}`
-          );
-          const data = await res.json();
-          if (!res.ok || !data.ok) {
-            throw new Error(data.error || "Failed to load timetable");
-          }
-
-          const list = data.upcoming || [];
-          if (!list.length) {
-            upcomingList.innerHTML =
-              '<div class="upcoming-item" style="color:#9ca3af">No upcoming classes in the next 24 hours.</div>';
-            return;
-          }
-
-          upcomingList.innerHTML = "";
-          list.forEach((item) => {
-            const div = document.createElement("div");
-            div.className = "upcoming-item";
-            div.innerHTML = `
-              <div class="upcoming-item-main">
-                <div>
-                  <div class="upcoming-item-title">${item.subject}</div>
-                  <div class="upcoming-item-meta">
-                    ${item.time_label || ""} · ${item.room || ""}
-                  </div>
-                </div>
-                <div class="pill-soft">${item.type || "Lecture"}</div>
-              </div>
-              <div class="upcoming-item-badges">
-                <span class="pill-soft">${item.faculty || "Faculty TBD"}</span>
-                ${
-                  item.note
-                    ? `<span class="pill-soft">${item.note}</span>`
-                    : ""
-                }
-              </div>
-            `;
-            upcomingList.appendChild(div);
-          });
-        } catch (err) {
-          console.error(err);
-          upcomingList.innerHTML =
-            '<div class="upcoming-item" style="color:#9ca3af">Could not load upcoming classes.</div>';
-        }
-      }
-
-      tabToday.addEventListener("click", () => {
-        tabToday.classList.add("tab--active");
-        tabWeek.classList.remove("tab--active");
-        tabMonth.classList.remove("tab--active");
-        tabToday
-          .querySelector(".tab-dot")
-          .classList.add("tab-dot--active");
-        tabWeek
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        tabMonth
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        fetchAttendanceView("today");
-      });
-
-      tabWeek.addEventListener("click", () => {
-        tabWeek.classList.add("tab--active");
-        tabToday.classList.remove("tab--active");
-        tabMonth.classList.remove("tab--active");
-        tabWeek
-          .querySelector(".tab-dot")
-          .classList.add("tab-dot--active");
-        tabToday
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        tabMonth
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        fetchAttendanceView("week");
-      });
-
-      tabMonth.addEventListener("click", () => {
-        tabMonth.classList.add("tab--active");
-        tabToday.classList.remove("tab--active");
-        tabWeek.classList.remove("tab--active");
-        tabMonth
-          .querySelector(".tab-dot")
-          .classList.add("tab-dot--active");
-        tabToday
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        tabWeek
-          .querySelector(".tab-dot")
-          .classList.remove("tab-dot--active");
-        fetchAttendanceView("month");
-      });
-
-      uploadPhotoBtn.addEventListener("click", () => {
-        const url = prompt(
-          "Paste a direct image URL for your profile photo for now."
-        );
-        if (!url) return;
-        photoPreview.src = url;
-        photoPreview.style.display = "block";
-        photoFallback.style.display = "none";
-        photoPreview.dataset.pendingUrl = url;
-
-        userAvatarPhoto.src = url;
-        userAvatarPhoto.style.display = "block";
-        userAvatarInitials.style.display = "none";
-      });
-
-      savePhotoBtn.addEventListener("click", async () => {
-        const pendingUrl = photoPreview.dataset.pendingUrl;
-        if (!pendingUrl) {
-          alert("Upload a photo URL first.");
-          return;
-        }
-        try {
-          savePhotoBtn.disabled = true;
-          savePhotoBtn.textContent = "Saving...";
-          const res = await fetch(
-            `/api/student/photo?roll=${encodeURIComponent(roll)}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ photo_url: pendingUrl }),
-            }
-          );
-          const data = await res.json();
-          if (!res.ok || !data.ok) {
-            throw new Error(data.error || "Failed to save photo");
-          }
-          alert("Profile photo updated.");
-          delete photoPreview.dataset.pendingUrl;
-
-          userAvatarPhoto.src = pendingUrl;
-          userAvatarPhoto.style.display = "block";
-          userAvatarInitials.style.display = "none";
-        } catch (err) {
-          console.error(err);
-          alert("Could not save photo. Please try again.");
+          alert("Error during face scanning.");
         } finally {
-          savePhotoBtn.disabled = false;
-          savePhotoBtn.textContent = "Save photo";
+          aiCaptureBtn.disabled = false;
+          aiCaptureBtn.textContent = "Scan Face";
         }
       });
 
-      if (userAvatarButton) {
-        userAvatarButton.addEventListener("click", () => {
-          const url =
-            userAvatarPhoto.style.display === "block"
-              ? userAvatarPhoto.src
-              : photoPreview.style.display === "block"
-              ? photoPreview.src
-              : null;
-
-          if (!url) return;
-          window.open(url, "_blank", "noopener,noreferrer");
-        });
-      }
-
-      if (enrollFaceBtn) {
-        enrollFaceBtn.addEventListener("click", async () => {
-          try {
-            enrollFaceStatus.textContent = "";
-            const faceToken = prompt(
-              "Enter a secret phrase for face login demo. Remember this!"
-            );
-            if (!faceToken) {
-              enrollFaceStatus.textContent = "Face login enrollment cancelled.";
-              return;
-            }
-
-            const res = await fetch(
-              `/api/students/${encodeURIComponent(
-                roll
-              )}/face-enroll`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ face_token: faceToken }),
-              }
-            );
-            const data = await res.json();
-            if (!res.ok || !data.ok) {
-              throw new Error(data.error || "Failed to enroll face");
-            }
-            enrollFaceStatus.textContent =
-              "Face login demo enrolled. Use this phrase on the login page.";
-          } catch (err) {
-            console.error(err);
-            enrollFaceStatus.textContent =
-              "Could not enroll face login. Please try again.";
-          }
-        });
-      }
-
-      if (saveProfileBtn) {
-        saveProfileBtn.addEventListener("click", async () => {
-          try {
-            saveProfileStatus.textContent = "";
-            const usn = studentUsnInput.value.trim();
-            const semester = studentSemesterInput.value.trim();
-
-            if (!usn || !semester) {
-              saveProfileStatus.textContent =
-                "USN and semester are required.";
-              return;
-            }
-
-            saveProfileBtn.disabled = true;
-            saveProfileStatus.textContent = "Saving...";
-
-            const res = await fetch("/api/student/profile", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ usn, semester }),
-            });
-            const data = await res.json();
-            if (!res.ok || !data.ok) {
-              throw new Error(data.error || "Failed to save profile");
-            }
+      // Existing handlers
+      saveProfileBtn.addEventListener("click", async () => {
+        try {
+          const usn = studentUsnInput.value.trim();
+          const semester = studentSemesterInput.value.trim();
+          const res = await fetch("/api/student/profile", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ usn, semester }),
+          });
+          if (res.ok) {
             saveProfileStatus.textContent = "Saved.";
-          } catch (err) {
-            console.error(err);
-            saveProfileStatus.textContent =
-              "Could not save profile. Please try again.";
-          } finally {
-            saveProfileBtn.disabled = false;
+            setTimeout(() => saveProfileStatus.textContent = "", 2000);
           }
-        });
-      }
+        } catch (e) { console.error(e); }
+      });
 
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-          try {
-            await fetch("/auth/logout", { method: "POST" });
-          } catch (err) {
-            console.error(err);
-          }
-          window.location.href = "/login";
-        });
-      }
+      logoutBtn.addEventListener("click", async () => {
+        await fetch("/auth/logout", { method: "POST" });
+        window.location.href = "login.html";
+      });
 
-      fetchStudentProfile();
-      fetchStudentMetrics();
-      fetchAttendanceView("today");
-      fetchUpcoming();
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchStudentProfile();
+        fetchStudentMetrics();
+      });
     </script>
   </body>
 </html>
