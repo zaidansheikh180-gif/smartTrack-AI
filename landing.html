@@ -580,34 +580,23 @@
 
     /* Footer */
     .footer {
-      margin-top: 8px;
+      margin-top: 4px;
       font-size: 10px;
       color: #6b7280;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 10px;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
-    .footer-links a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .footer-links a:hover {
+    .footer a {
       text-decoration: underline;
+      text-underline-offset: 3px;
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <!-- Header -->
     <header class="header">
       <div class="brand">
         <div class="brand-logo">
@@ -623,16 +612,14 @@
           <span class="pill-dot"></span>
           Live demo · Teacher view
         </div>
-        <a href="/login" class="btn-ghost">
+        <a href="login.html" class="btn-ghost">
           Login
           <span>→</span>
         </a>
       </div>
     </header>
 
-    <!-- Hero -->
     <main class="hero">
-      <!-- Left: copy -->
       <section>
         <div class="eyebrow">
           <span class="eyebrow-label">AI‑assisted attendance</span>
@@ -640,46 +627,42 @@
         </div>
 
         <h1 class="headline">
-          <span>Turn messy</span><br>
-          <span class="headline-gradient">attendance into live insights.</span>
+          <span>Turn messy attendance into</span><br>
+          <span class="headline-gradient">live, actionable insights.</span>
         </h1>
 
         <p class="subtext">
-          SmartTrack AI replaces paper registers with a live, section‑wise dashboard. Teachers get one‑click snapshots, students get clear history, and your data stays organized.
+          SmartTrack AI replaces paper registers with a live, section-wise dashboard. Teachers get one-click snapshots, students get clear history, and your data stays organized.
         </p>
 
         <div class="hero-metrics">
           <div class="metric">
-            <strong>2 views</strong>
-            <span>teacher + student dashboards</span>
+            <strong>2 views:</strong> teacher + student
           </div>
           <div class="metric">
-            <strong>Face‑ready</strong>
-            <span>profile photos stored per student</span>
+            <strong>Face-ready:</strong> profile photos per student
           </div>
           <div class="metric">
-            <strong>Zero Excel</strong>
-            <span>all sections in one place</span>
+            <strong>Zero Excel:</strong> all sections in one place
           </div>
         </div>
 
         <div class="hero-actions">
-          <a href="/login" class="btn-primary">
+          <a href="login.html" class="btn-primary">
             Get started · Login
             <span>↗</span>
           </a>
-          <a href="/teacher" class="btn-secondary">
+          <a href="teacher.html" class="btn-secondary">
             Open teacher demo
             <span>▢</span>
           </a>
         </div>
 
         <p class="hero-footnote">
-          No auth wired yet – login/teacher routes are demo‑ready so you can plug in real signup and face identity later.
+          Secure authentication active – Log in as a teacher to manage live sections or as a student to view your attendance history.
         </p>
       </section>
 
-      <!-- Right: visual card -->
       <aside class="hero-card">
         <div class="hero-card-header">
           <div class="hero-card-tabs">
@@ -688,7 +671,7 @@
           </div>
           <div class="hero-card-badge">
             <span>●</span>
-            Live section: AIML‑C
+            Live section: AIML-C
           </div>
         </div>
 
@@ -698,7 +681,7 @@
             <div class="hero-roster-header">
               <div>
                 <div class="hero-roster-title">Today · Python Lab</div>
-                <div class="hero-roster-sub">Section AIML‑C · 24 Jan 2026</div>
+                <div class="hero-roster-sub">Section AIML-C · 24 Jan 2026</div>
               </div>
               <div class="hero-roster-tag">Quick save snapshot</div>
             </div>
@@ -723,7 +706,7 @@
 
             <div class="hero-roster-foot">
               <span><strong>18/24</strong> marked · synced to history</span>
-              <span>Tap to drill into per‑student details →</span>
+              <span>Tap to drill into per-student details →</span>
             </div>
           </div>
 
@@ -736,7 +719,7 @@
               </div>
               <div class="hero-insights-chip">
                 <span>⚡</span>
-                AI‑ready signals
+                AI-ready signals
               </div>
             </div>
 
@@ -749,7 +732,7 @@
               <div class="hero-insights-box">
                 <div class="hero-insights-label">Chronic absentees</div>
                 <div class="hero-insights-value">3 students</div>
-                <div class="hero-insights-trend">Flagged for follow‑up</div>
+                <div class="hero-insights-trend">Flagged for follow-up</div>
               </div>
             </div>
 
@@ -762,13 +745,9 @@
       </aside>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       <span>SmartTrack AI · Demo build · AIML project</span>
-      <div class="footer-links">
-        <a href="/teacher">Teacher view</a>
-        <a href="/login">Login</a>
-      </div>
+      <span><a href="/teacher">Teacher view</a> · <a href="/login">Login</a></span>
     </footer>
   </div>
 </body>

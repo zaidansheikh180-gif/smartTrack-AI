@@ -530,9 +530,9 @@
       <div class="info-footer">
         <span
           >Need to see the app first?
-          <a href="/teacher" class="info-footer-link">Open teacher demo</a></span
+          <a href="teacher.html" class="info-footer-link">Open teacher demo</a></span
         >
-        <a href="/" class="info-footer-link">Back to landing</a>
+        <a href="landing.html" class="info-footer-link">Back to landing</a>
       </div>
     </section>
 
@@ -647,7 +647,7 @@
           <br />Teacher – teacher@college.edu / password123
           <br />Student – student20@college.edu / password123</span
         >
-        <a href="/">Back to landing</a>
+        <a href="landing.html">Back to landing</a>
       </div>
     </section>
   </div>
@@ -677,7 +677,7 @@
     });
 
     function goDemoTeacher() {
-      window.location.href = "/teacher";
+      window.location.href = "teacher.html";
     }
 
     form.addEventListener("submit", async (e) => {
@@ -709,12 +709,12 @@
         if (data.redirect) {
           window.location.href = data.redirect;
         } else if (data.role === "teacher") {
-          window.location.href = "/teacher";
+          window.location.href = "teacher.html";
         } else if (data.role === "student" && data.roll) {
           window.location.href =
-            "/student?roll=" + encodeURIComponent(data.roll);
+            "student.html?roll=" + encodeURIComponent(data.roll);
         } else {
-          window.location.href = "/";
+          window.location.href = "landing.html";
         }
       } catch (err) {
         console.error(err);
@@ -759,10 +759,11 @@
         if (data.redirect) {
           window.location.href = data.redirect;
         } else if (data.roll) {
+          faceLoginStatus.textContent = "Redirecting…";
           window.location.href =
-            "/student?roll=" + encodeURIComponent(data.roll);
+            "student.html?roll=" + encodeURIComponent(data.roll);
         } else {
-          window.location.href = "/";
+          window.location.href = "landing.html";
         }
       } catch (err) {
         console.error(err);
@@ -781,10 +782,10 @@
         if (!data.ok) return;
 
         if (data.role === "teacher") {
-          window.location.href = "/teacher";
+          window.location.href = "teacher.html";
         } else if (data.role === "student" && data.roll) {
           window.location.href =
-            "/student?roll=" + encodeURIComponent(data.roll);
+            "student.html?roll=" + encodeURIComponent(data.roll);
         }
       } catch (e) {
         console.error(e);
