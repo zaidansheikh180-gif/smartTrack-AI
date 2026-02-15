@@ -28,18 +28,12 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
     body {
       min-height: 100vh;
-      background: radial-gradient(
-        circle at top,
-        #111827 0,
-        #020617 45%,
-        #000 100%
-      );
+      background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
       color: var(--text);
       display: flex;
       align-items: center;
@@ -47,84 +41,43 @@
       padding: 16px;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
     .page {
       width: 100%;
-      max-width: 960px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    @media (max-width: 840px) {
-      .page {
-        grid-template-columns: minmax(0, 1fr);
-        max-width: 460px;
-      }
-    }
-
-    .info-card {
-      border-radius: 26px;
-      padding: 18px 18px 16px;
-      background: radial-gradient(
-          circle at 0 0,
-          rgba(56, 189, 248, 0.25) 0,
-          rgba(15, 23, 42, 0.92) 42%
-        ),
-        radial-gradient(
-          circle at 100% 0,
-          rgba(129, 140, 248, 0.3) 0,
-          rgba(15, 23, 42, 0.96) 50%
-        );
-      border: 1px solid rgba(148, 163, 184, 0.32);
-      box-shadow: var(--shadow-soft);
+      max-width: 460px; /* Force center and smaller width */
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 16px;
+      gap: 24px;
     }
 
     .auth-card {
       border-radius: 26px;
-      padding: 16px 16px 14px;
-      background: radial-gradient(
-        circle at 0 0,
-        rgba(37, 99, 235, 0.26) 0,
-        rgba(15, 23, 42, 0.98) 45%
-      );
+      padding: 24px;
+      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.26) 0, rgba(15, 23, 42, 0.98) 45%);
       border: 1px solid rgba(148, 163, 184, 0.35);
       box-shadow: var(--shadow-soft);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 18px;
     }
 
     .auth-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      text-align: center;
     }
 
     .auth-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .auth-sub {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
     }
 
     .auth-tabs {
-      margin-top: 4px;
-      display: inline-flex;
-      padding: 3px;
+      display: flex;
+      padding: 4px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(31, 41, 55, 0.9);
@@ -132,13 +85,15 @@
     }
 
     .auth-tab {
-      padding: 5px 10px;
+      flex: 1;
+      padding: 8px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 13px;
       color: var(--muted);
       cursor: pointer;
       border: 1px solid transparent;
-      white-space: nowrap;
+      background: transparent;
+      transition: all 0.2s;
     }
 
     .auth-tab.active {
@@ -148,290 +103,296 @@
     }
 
     .auth-form {
-      margin-top: 6px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
     }
 
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .field-label {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--muted);
+      margin-left: 4px;
     }
 
     .field-input {
       width: 100%;
-      padding: 8px 10px;
-      border-radius: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
       border: 1px solid rgba(55, 65, 81, 0.95);
       background: rgba(15, 23, 42, 0.96);
       color: var(--text);
-      font-size: 12px;
+      font-size: 14px;
       outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: var(--accent);
+    }
+
+    .auth-actions-main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
     }
 
     .btn-primary {
       width: 100%;
-      padding: 9px 12px;
+      padding: 12px;
       border-radius: var(--radius-full);
       border: none;
       cursor: pointer;
       background: linear-gradient(135deg, #4f46e5, #22c55e);
       color: #f9fafb;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
     }
 
     .btn-face {
       width: 100%;
-      padding: 8px 12px;
+      padding: 12px;
       border-radius: var(--radius-full);
       border: 1px solid rgba(129, 140, 248, 0.9);
       background: rgba(15, 23, 42, 0.96);
       color: #e5e7eb;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    /* Webcam Modal Styles */
+    .auth-footnote {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .auth-footnote a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* AI Modal */
     .ai-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(10px);
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-      .ai-modal-content {
-        background: #020617;
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 24px;
-        max-width: 500px;
-        width: 100%;
-        padding: 24px;
-        text-align: center;
-        position: relative;
-      }
-      .ai-video-container {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 4/3;
-        background: #000;
-        border-radius: 16px;
-        overflow: hidden;
-        margin: 16px 0;
-      }
-      #ai-video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      #ai-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-      .ai-loader {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(2, 6, 23, 0.8);
-        color: #fff;
-        font-size: 0.9rem;
-      }
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .ai-modal-content {
+      background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .ai-video-container {
+      position: relative;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 16px 0;
+      aspect-ratio: 1;
+    }
+
+    #ai-video { width: 100%; height: 100%; object-fit: cover; }
+    #ai-loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(0,0,0,0.7); }
 
   </style>
 </head>
 <body>
   <div class="page">
-    <section class="info-card" style="display:none;">
-      <!-- Info card content can be restored if needed -->
-    </section>
-
     <section class="auth-card">
       <header class="auth-header">
-        <div>
-          <div class="auth-title">Welcome back</div>
-          <div class="auth-sub">Choose your role and continue.</div>
-        </div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-sub">Secure access to SmartTrack AI</p>
       </header>
 
       <div class="auth-tabs" id="role-tabs">
-        <button class="auth-tab active" data-role="teacher" type="button">
-          Teacher
-        </button>
-        <button class="auth-tab" data-role="student" type="button">
-          Student
-        </button>
+        <button class="auth-tab active" data-role="teacher">Teacher</button>
+        <button class="auth-tab" data-role="student">Student</button>
       </div>
 
       <form class="auth-form" id="auth-form">
         <div class="field-group">
-          <label class="field-label" for="email">College email</label>
-          <input id="email" type="email" class="field-input" required />
+          <label class="field-label">College email</label>
+          <input id="email" type="email" class="field-input" placeholder="name@college.edu" required />
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="password">Password</label>
-          <input id="password" type="password" class="field-input" required />
+          <label class="field-label">Password</label>
+          <input id="password" type="password" class="field-input" placeholder="••••••••" required />
         </div>
 
-        <div class="auth-actions-main" style="margin-top:1rem;">
-          <button class="btn-primary" type="submit">
-            Login with Email
-          </button>
+        <div class="auth-actions-main">
+          <button class="btn-primary" type="submit">Sign In</button>
           <button class="btn-face" type="button" id="face-login-btn">
-            Sign in with Face ID
+            <span>📷</span> Sign in with Face ID
           </button>
         </div>
 
-        <div id="status" style="font-size: 11px; margin-top: 6px; color: #9ca3af; text-align:center;"></div>
+        <div id="status" style="font-size: 12px; margin-top: 8px; color: #9ca3af; text-align:center;"></div>
       </form>
+
+      <div class="auth-footnote">
+        <p>Demo accounts:<br>
+        Teacher: teacher@college.edu / password123<br>
+        Student: student20@college.edu / password123</p>
+        <p style="margin-top: 12px;"><a href="landing.html">Back to landing page</a></p>
+      </div>
     </section>
   </div>
 
-  <!-- AI Webcam Modal -->
   <div id="ai-modal" class="ai-modal">
-      <div class="ai-modal-content">
-        <h3 id="ai-modal-title">Face ID Login</h3>
-        <p id="ai-modal-sub" style="font-size: 0.8rem; color: #9ca3af; margin-top: 4px;">
-          Position your face in the center of the frame.
-        </p>
-
-        <div class="ai-video-container">
-          <video id="ai-video" autoplay muted playsinline></video>
-          <canvas id="ai-canvas"></canvas>
-          <div id="ai-loader" class="ai-loader">Initializing AI models...</div>
-        </div>
-
-        <div style="display: flex; gap: 12px; justify-content: center;">
-          <button id="ai-close-btn" class="btn-primary" style="background: #555;">
-            <span>Cancel</span>
-          </button>
-        </div>
+    <div class="ai-modal-content">
+      <h3>Face ID Login</h3>
+      <div class="ai-video-container">
+        <video id="ai-video" autoplay muted playsinline></video>
+        <div id="ai-loader">Initializing AI...</div>
       </div>
+      <button class="btn-primary" id="ai-close-btn" style="background: #333;">Cancel</button>
     </div>
+  </div>
 
   <script>
+    const tabs = document.querySelectorAll(".auth-tab");
     const form = document.getElementById("auth-form");
     const statusEl = document.getElementById("status");
     const faceLoginBtn = document.getElementById("face-login-btn");
-
-    // AI Elements
     const aiModal = document.getElementById("ai-modal");
     const aiVideo = document.getElementById("ai-video");
     const aiLoader = document.getElementById("ai-loader");
     const aiCloseBtn = document.getElementById("ai-close-btn");
 
+    let currentRole = "teacher";
     let modelsLoaded = false;
     let stream = null;
 
-    // --- AI Face Recognition Logic ---
-
-    async function loadAIModels() {
-        if (modelsLoaded) return;
-        aiLoader.style.display = "flex";
-        aiLoader.textContent = "Loading AI models...";
-        const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-        await Promise.all([
-          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
-        ]);
-        modelsLoaded = true;
-        aiLoader.style.display = "none";
-    }
-
-    async function startWebcam() {
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-          aiVideo.srcObject = stream;
-          return new Promise(resolve => (aiVideo.onloadedmetadata = resolve));
-        } catch (err) {
-          alert("Could not access webcam. Please check permissions.");
-          closeAIModal();
-        }
-    }
-
-    function stopWebcam() {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        stream = null;
-    }
-
-    function closeAIModal() {
-        aiModal.style.display = "none";
-        stopWebcam();
-    }
-
-    faceLoginBtn.addEventListener("click", async () => {
-        aiModal.style.display = "flex";
-        await loadAIModels();
-        await startWebcam();
-
-        const canvas = faceapi.createCanvasFromMedia(aiVideo);
-        document.querySelector('.ai-video-container').append(canvas);
-        const displaySize = { width: aiVideo.clientWidth, height: aiVideo.clientHeight };
-        faceapi.matchDimensions(canvas, displaySize);
-
-        const interval = setInterval(async () => {
-            const detections = await faceapi.detectAllFaces(aiVideo, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-            if (detections.length > 0 && detections[0].descriptor) {
-              clearInterval(interval);
-              const descriptor = Array.from(detections[0].descriptor);
-              handleFaceLogin(descriptor);
-            }
-        }, 300);
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentRole = tab.dataset.role;
+      });
     });
 
-    aiCloseBtn.addEventListener("click", closeAIModal);
+    // Email/Password Login Logic
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Signing in...";
+      statusEl.style.color = "#9ca3af";
 
-    async function handleFaceLogin(descriptor) {
-      statusEl.textContent = "Face detected! Logging in...";
-      closeAIModal();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
       try {
-        const res = await fetch("/auth/face-login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ descriptor }),
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ email, password }).toString(),
         });
 
         const data = await res.json();
-        if (!data.ok) {
-          statusEl.textContent = data.error || "Face login failed.";
+
+        if (!data.success) {
+          statusEl.textContent = data.message || "Login failed.";
           statusEl.style.color = "#f97373";
           return;
         }
 
-        statusEl.textContent = "Login successful! Redirecting...";
+        statusEl.textContent = "Success! Redirecting...";
+        statusEl.style.color = "#4ade80";
         window.location.href = data.redirect;
-
       } catch (err) {
-        statusEl.textContent = "Server error during face login.";
+        statusEl.textContent = "Connection error.";
+        statusEl.style.color = "#f97373";
       }
-    }
-
-    // Classic email login
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      // ... existing email login logic ...
     });
 
+    // Face Login Logic
+    async function loadAIModels() {
+      if (modelsLoaded) return;
+      aiLoader.style.display = "flex";
+      const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+      await Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
+      ]);
+      modelsLoaded = true;
+      aiLoader.style.display = "none";
+    }
+
+    faceLoginBtn.addEventListener("click", async () => {
+      aiModal.style.display = "flex";
+      try {
+        await loadAIModels();
+        stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+        aiVideo.srcObject = stream;
+
+        const interval = setInterval(async () => {
+          const detections = await faceapi.detectAllFaces(aiVideo, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+          if (detections.length > 0) {
+            clearInterval(interval);
+            const descriptor = Array.from(detections[0].descriptor);
+            handleFaceLogin(descriptor);
+          }
+        }, 500);
+      } catch (err) {
+        alert("Webcam error.");
+        closeAIModal();
+      }
+    });
+
+    async function handleFaceLogin(descriptor) {
+      closeAIModal();
+      statusEl.textContent = "Face recognized! Logging in...";
+      try {
+        const res = await fetch("/auth/face-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ descriptor }),
+        });
+        const data = await res.json();
+        if (data.ok) window.location.href = data.redirect;
+        else statusEl.textContent = data.error;
+      } catch (e) { statusEl.textContent = "Face login error."; }
+    }
+
+    function closeAIModal() {
+      aiModal.style.display = "none";
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    }
+
+    aiCloseBtn.addEventListener("click", closeAIModal);
   </script>
 </body>
 </html>
